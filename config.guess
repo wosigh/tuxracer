@@ -159,6 +159,9 @@ EOF
     arm:RISC*:1.[012]*:*|arm:riscix:1.[012]*:*)
 	echo arm-acorn-riscix${UNAME_RELEASE}
 	exit 0;;
+    arm:Linux:*:*)
+	echo arm-none-linux-gnueabi
+	exit 0;;
     arm32:NetBSD:*:*)
 	echo arm-unknown-netbsd`echo ${UNAME_RELEASE}|sed -e 's/[-_].*/\./'`
 	exit 0 ;;
