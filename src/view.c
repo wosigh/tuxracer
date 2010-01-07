@@ -317,7 +317,16 @@ void setup_view_matrix( player_data_t *plyr )
     view_mat[3][2] = -viewpt_in_view_frame.z;
     
     glLoadIdentity();
+#ifdef WEBOS
+    GLfloat m[3][3] = {
+      {view_mat[0][0], view_mat[0][1], view_mat[0][2]},
+      {view_mat[1][0], view_mat[1][1], view_mat[1][2]},
+      {view_mat[2][0], view_mat[2][1], view_mat[2][2]},
+    };
+    glMultMatrixf((GLfloat*)m);
+#else
     glMultMatrixd( (scalar_t *) view_mat );
+#endif
 }
 
 /*! 

@@ -103,7 +103,7 @@ quadtree.o race_select.o racing.o render_util.o reset.o save.o \
 screenshot.o splash_screen.o ssbutton.o string_util.o tcl_util.o \
 tex_font_metrics.o textarea.o textures.o track_marks.o tux.o \
 tux_shadow.o ui_mgr.o ui_snow.o ui_theme.o view.o viewfrustum.o \
-winsys.o
+winsys.o webos.o
 tuxracer_LDADD = $(LDADD)
 tuxracer_DEPENDENCIES = 
 tuxracer_LDFLAGS = 

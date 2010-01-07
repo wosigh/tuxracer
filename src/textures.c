@@ -131,6 +131,10 @@ bool_t load_texture( char *texname, char *filename, int repeatable )
     if ( texImage->sizeX > max_texture_size ||
 	 texImage->sizeY > max_texture_size ) 
     {
+#ifdef WEBOS
+      printf("We don't support scaling image yet!?\n");
+      abort();
+#else
 	char *newdata = (char*)malloc( texImage->sizeZ *
 				       max_texture_size *
 				       max_texture_size );
@@ -155,11 +159,24 @@ bool_t load_texture( char *texname, char *filename, int repeatable )
 	texImage->data = (unsigned char*) newdata;
 	texImage->sizeX = max_texture_size;
 	texImage->sizeY = max_texture_size;
+#endif
     }
 
+#ifdef WEBOS // EJG: From iphone TRWC
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    
+    glTexImage2D( GL_TEXTURE_2D, 0, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA, texImage->sizeX,
+		       texImage->sizeY == 255 ? 256 : texImage->sizeY /* Work around for tree.png */,
+               0, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA,
+		       GL_UNSIGNED_BYTE, texImage->data );
+#else
     gluBuild2DMipmaps( GL_TEXTURE_2D, texImage->sizeZ, texImage->sizeX,
 		       texImage->sizeY, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA, 
 		       GL_UNSIGNED_BYTE, texImage->data );
+#endif
 
     free( texImage->data );
     free( texImage );

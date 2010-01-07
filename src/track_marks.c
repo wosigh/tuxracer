@@ -421,8 +421,6 @@ void draw_track_marks(void)
     GLfloat v[12];
 
 	    glNormal3f( q->n1.x, q->n1.y, q->n1.z );
-	    glTexCoord2f( q->t1.x, q->t1.y );
-	    glVertex3f( q->v1.x, q->v1.y, q->v1.z );
     t[0]=q->t1.x;
     t[1]=q->t1.y;
     v[0]=q->v1.x;
@@ -431,8 +429,6 @@ void draw_track_marks(void)
     
 	
 	    glNormal3f( q->n2.x, q->n2.y, q->n2.z );
-	    glTexCoord2f( q->t2.x, q->t2.y );
-	    glVertex3f( q->v2.x, q->v2.y, q->v2.z );
     t[2]=q->t2.x;
     t[3]=q->t2.y;
     v[3]=q->v2.x;
@@ -441,8 +437,6 @@ void draw_track_marks(void)
     
 
 	    glNormal3f( q->n4.x, q->n4.y, q->n4.z );
-	    glTexCoord2f( q->t4.x, q->t4.y );
-	    glVertex3f( q->v4.x, q->v4.y, q->v4.z );
     t[4]=q->t4.x;
     t[5]=q->t4.y;
     v[6]=q->v4.x;
@@ -450,8 +444,6 @@ void draw_track_marks(void)
     v[8]=q->v4.z;
 	
 	    glNormal3f( q->n3.x, q->n3.y, q->n3.z );
-	    glTexCoord2f( q->t3.x, q->t3.y );
-	    glVertex3f( q->v3.x, q->v3.y, q->v3.z );
     t[5]=q->t3.x;
     t[7]=q->t3.y;
     v[9]=q->v3.x;

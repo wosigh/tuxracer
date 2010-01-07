@@ -66,8 +66,50 @@ void draw_sphere( int num_divisions )
 	sin_phi_d_phi = sin( phi + d_phi );
 	cos_phi_d_phi = cos( phi + d_phi );
         
+#ifdef WEBOS
+  GLfloat *vptr = NULL;
+  int count = 2;
+  int i=3;
+  GLenum gl_type=GL_TRIANGLE_FAN;
+#endif
+
         if ( phi <= eps ) {
 
+#ifdef WEBOS
+          gl_type=GL_TRIANGLE_FAN;
+                for ( theta = 0.0; theta + eps < twopi; theta += d_theta ) {
+                  count++;
+                }
+                vptr = malloc(3 * count * sizeof (GLfloat));
+                glNormal3f( 0.0, 0.0, 1.0 );
+                vptr[0]=0.0;
+                vptr[1]=0.0;
+                vptr[2]=1.0;
+
+                for ( theta = 0.0; theta + eps < twopi; theta += d_theta ) {
+		    sin_theta = sin( theta );
+		    cos_theta = cos( theta );
+
+                    x = cos_theta * sin_phi_d_phi;
+		    y = sin_theta * sin_phi_d_phi;
+                    z = cos_phi_d_phi;
+                    glNormal3f( x, y, z );
+
+                    vptr[i]=x;
+                    vptr[i+1]=y;
+                    vptr[i+2]=z;
+                    i+=3;
+
+                } 
+
+		x = sin_phi_d_phi;
+		y = 0.0;
+		z = cos_phi_d_phi;
+                glNormal3f( x, y, z );
+                    vptr[i]=x;
+                    vptr[i+1]=y;
+                    vptr[i+2]=z;
+#else
             glBegin( GL_TRIANGLE_FAN );
                 glNormal3f( 0.0, 0.0, 1.0 );
                 glVertex3f( 0.0, 0.0, 1.0 );
@@ -90,9 +132,42 @@ void draw_sphere( int num_divisions )
                 glNormal3f( x, y, z );
                 glVertex3f( x, y, z );
             glEnd();
+#endif
 
         } else if ( phi + d_phi + eps >= M_PI ) {
             
+#ifdef WEBOS
+                gl_type = GL_TRIANGLE_FAN;
+                for ( theta = twopi; theta - eps > 0; theta -= d_theta ) {
+                  count++;
+                }
+                vptr = malloc(3 * count * sizeof (GLfloat));
+                glNormal3f( 0.0, 0.0, -1.0 );
+                vptr[0]=0.0;
+                vptr[0]=0.0;
+                vptr[0]=-1.0;
+
+                for ( theta = twopi; theta - eps > 0; theta -= d_theta ) {
+		    sin_theta = sin( theta );
+		    cos_theta = cos( theta );
+
+                    x = cos_theta * sin_phi;
+                    y = sin_theta * sin_phi;
+                    z = cos_phi;
+                    glNormal3f( x, y, z );
+                    vptr[i]=x;
+                    vptr[i+1]=y;
+                    vptr[i+2]=z;
+                    i+=3;
+                } 
+                x = sin_phi;
+                y = 0.0;
+                z = cos_phi;
+                glNormal3f( x, y, z );
+                    vptr[i]=x;
+                    vptr[i+1]=y;
+                    vptr[i+2]=z;
+#else
             glBegin( GL_TRIANGLE_FAN );
                 glNormal3f( 0.0, 0.0, -1.0 );
                 glVertex3f( 0.0, 0.0, -1.0 );
@@ -113,9 +188,56 @@ void draw_sphere( int num_divisions )
                 glNormal3f( x, y, z );
                 glVertex3f( x, y, z );
             glEnd();
+#endif
 
         } else {
             
+#ifdef WEBOS
+          gl_type=GL_TRIANGLE_STRIP;
+                for ( theta = 0.0; theta + eps < twopi; theta += d_theta ) {
+                  count++;
+                }
+                vptr = malloc(3 * count * sizeof (GLfloat));
+                for ( theta = 0.0; theta + eps < twopi; theta += d_theta ) {
+		    sin_theta = sin( theta );
+		    cos_theta = cos( theta );
+
+                    x = cos_theta * sin_phi;
+                    y = sin_theta * sin_phi;
+                    z = cos_phi;
+                    glNormal3f( x, y, z );
+                    vptr[i]=x;
+                    vptr[i+1]=y;
+                    vptr[i+2]=z;
+                    i+=3;
+
+                    x = cos_theta * sin_phi_d_phi;
+                    y = sin_theta * sin_phi_d_phi;
+                    z = cos_phi_d_phi;
+                    glNormal3f( x, y, z );
+                    vptr[i]=x;
+                    vptr[i+1]=y;
+                    vptr[i+2]=z;
+                    i+=3;
+                } 
+                x = sin_phi;
+                y = 0.0;
+                z = cos_phi;
+                glNormal3f( x, y, z );
+                    vptr[i]=x;
+                    vptr[i+1]=y;
+                    vptr[i+2]=z;
+                    i+=3;
+
+                x = sin_phi_d_phi;
+                y = 0.0;
+                z = cos_phi_d_phi;
+                glNormal3f( x, y, z );
+                    vptr[i]=x;
+                    vptr[i+1]=y;
+                    vptr[i+2]=z;
+
+#else
             glBegin( GL_TRIANGLE_STRIP );
                 
                 for ( theta = 0.0; theta + eps < twopi; theta += d_theta ) {
@@ -147,8 +269,14 @@ void draw_sphere( int num_divisions )
                 glVertex3f( x, y, z );
 
             glEnd();
+#endif
 
         } 
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vptr);
+  glDrawArrays(gl_type, 0, count);
+
     } 
 } 
 
@@ -208,7 +336,16 @@ void traverse_dag( scene_node_t *node, material_t *mat )
     check_assertion( node != NULL, "node is NULL" );
     glPushMatrix();
 
+#ifdef WEBOS
+    GLfloat m[3][3]= {
+      {node->trans[0][0], node->trans[0][1], node->trans[0][2]},
+      {node->trans[1][0], node->trans[1][1], node->trans[1][2]},
+      {node->trans[2][0], node->trans[2][1], node->trans[2][2]},
+    };
+    glMultMatrixf((GLfloat*)m);
+#else
     glMultMatrixd( (double *) node->trans );
+#endif
 
     if ( node->mat != NULL ) {
         mat = node->mat;

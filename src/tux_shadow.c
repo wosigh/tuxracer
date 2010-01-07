@@ -108,6 +108,8 @@ void draw_shadow_sphere( matrixgl_t model_matrix )
 	sin_phi_d_phi = sin( phi + d_phi );
 	cos_phi_d_phi = cos( phi + d_phi );
         
+  //FIXME: I need sleep
+#if 0 
         if ( phi <= eps ) {
 
             glBegin( GL_TRIANGLE_FAN );
@@ -180,6 +182,7 @@ void draw_shadow_sphere( matrixgl_t model_matrix )
             glEnd();
 
         } 
+#endif
     } 
 
 } 
@@ -187,6 +190,8 @@ void draw_shadow_sphere( matrixgl_t model_matrix )
 void draw_shadow_vertex( scalar_t x, scalar_t y, scalar_t z, 
 			 matrixgl_t model_matrix )
 {
+  // FIXME
+#if 0
     point_t pt;
     scalar_t old_y;
     vector_t nml;
@@ -204,4 +209,5 @@ void draw_shadow_vertex( scalar_t x, scalar_t y, scalar_t z,
 
     glNormal3f( nml.x, nml.y, nml.z );
     glVertex3f( pt.x, pt.y, pt.z );
+#endif
 }

@@ -42,6 +42,30 @@ const colour_t light_blue = { 0.5, 0.5, 0.8, 1.0 };
 const colour_t black = { 0., 0., 0., 1.0 };
 const colour_t sky   = { 0.82, 0.86, 0.88, 1.0 };
 
+#ifdef WEBOS // EJG: From iphone TRWC
+const unsigned int PRECISION = 16; 
+GLfixed ONE  = 1 << 16 /*PRECISION*/; 
+const GLfixed ZERO = 0;
+
+inline GLfixed FixedFromInt(int value) {return value << PRECISION;}; 
+inline GLfixed FixedFromFloat(float value)  
+{ return (GLfixed)value;}; 
+inline GLfixed MultiplyFixed(GLfixed op1, GLfixed op2) 
+{ return (op1 * op2) >> PRECISION;};
+
+void glesPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar)
+{
+	GLfloat xmin, xmax, ymin, ymax;
+	
+	ymax = zNear * tan(fovy * M_PI / 360.0);
+	ymin = -ymax;
+	xmin = ymin * aspect;
+	xmax = ymax * aspect;
+	
+	glFrustumf(xmin, xmax, ymin, ymax, zNear, zFar);
+}
+#endif
+
 void reshape( int w, int h )
 {
     scalar_t far_clip_dist;
@@ -54,8 +78,13 @@ void reshape( int w, int h )
 
     far_clip_dist = getparam_forward_clip_distance() + FAR_CLIP_FUDGE_AMOUNT;
 
+#ifdef WEBOS
+    glesPerspective( getparam_fov(), (scalar_t)w/h, NEAR_CLIP_DIST, 
+		    far_clip_dist );
+#else
     gluPerspective( getparam_fov(), (scalar_t)w/h, NEAR_CLIP_DIST, 
 		    far_clip_dist );
+#endif
 
     glMatrixMode( GL_MODELVIEW );
 } 
@@ -66,7 +95,11 @@ void flat_mode()
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
+#ifdef WEBOS
+    glOrthof( -0.5, 639.5, -0.5, 479.5, -1.0, 1.0 );
+#else
     glOrtho( -0.5, 639.5, -0.5, 479.5, -1.0, 1.0 );
+#endif
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 }
