@@ -31,6 +31,27 @@ static void draw_quad(int x, int y, int w, int h)
     glPushMatrix();
     {
 	glTranslatef( x, y, 0 );
+#ifdef WEBOS
+  GLfloat t[8] = {
+	    0, 0,
+	    1, 0,
+	    1, 1,
+	    0, 1,
+  };
+
+  GLfloat v[8] = {
+	    0, 0,
+	    w, 0,
+	    w, h,
+	    0, h,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, v);
+  glTexCoordPointer(2, GL_FLOAT, 0, t);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+#else
 	glBegin( GL_QUADS );
 	{
 	    glTexCoord2f( 0, 0 );
@@ -46,6 +67,7 @@ static void draw_quad(int x, int y, int w, int h)
 	    glVertex2f( 0, h );
 	}
 	glEnd();
+#endif
     }
     glPopMatrix();
 }

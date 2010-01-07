@@ -308,6 +308,27 @@ void button_draw( button_t *button )
 
 	glColor4dv( (scalar_t*) &tex->colour );
 
+#ifdef WEBOS
+  const GLfloat texCoords[8] = {
+    tex->ll.x, tex->ll.y,
+	  tex->ur.x, tex->ll.y,
+	  tex->ur.x, tex->ur.y,
+    tex->ll.x, tex->ur.y
+  };
+  
+  const GLfloat vertexCoords[12] = {
+    pos.x, pos.y, 0,
+	  pos.x + w, pos.y, 0,
+	  pos.x + w, pos.y + h, 0,
+	  pos.x, pos.y + h, 0
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+#else
 	glBegin( GL_QUADS );
 	{
 	    glTexCoord2f( tex->ll.x, tex->ll.y );
@@ -323,6 +344,7 @@ void button_draw( button_t *button )
 	    glVertex3f( pos.x, pos.y + h, 0 );
 	}
 	glEnd();
+#endif
     }
 
     if ( font_binding && button->label != NULL ) {

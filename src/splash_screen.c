@@ -95,8 +95,13 @@ static void draw_logo()
     for (i=0; i<4; i++) {
 	glBindTexture( GL_TEXTURE_2D, texid[i] );
 
+#ifdef WEBOS
+  w = 320;
+  h = 480;
+#else
 	glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w );
 	glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h );
+#endif
 
 	ll.x = getparam_x_resolution()/2 + xoffsets[i]*w;
 	ll.y = getparam_y_resolution()/2 + yoffsets[i]*h;
@@ -104,6 +109,29 @@ static void draw_logo()
 	ur.y = ll.y + h;
 
 
+#ifdef WEBOS
+    {
+  const GLfloat texCoords[8] = {
+	    ll.x, ll.y,
+	    ur.x, ll.y,
+	    ur.x, ur.y,
+	    ll.x, ur.y,
+  };
+
+  const GLfloat vertexCoords[8] = {
+	    0.0, 0.0,
+	    1.0, 0.0,
+	    1.0, 1.0,
+	    0.0, 1.0,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+  }
+#else
 	glBegin( GL_QUADS );
 	{
 	    glTexCoord2f( 0.0, 0.0 );
@@ -116,6 +144,7 @@ static void draw_logo()
 	    glVertex2f( ll.x, ur.y );
 	}
 	glEnd();
+#endif
     }
 }
 

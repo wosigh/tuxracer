@@ -111,6 +111,7 @@ void debug_mode_set_active( debug_mode_t mode, bool_t active )
     debug_setting[ mode ] = active;
 }
 
+#if 0
 void print_debug( debug_mode_t mode, char *fmt, ... )
 {
     va_list args;
@@ -130,6 +131,7 @@ void print_debug( debug_mode_t mode, char *fmt, ... )
 
     va_end( args );
 }
+#endif
 
 
 

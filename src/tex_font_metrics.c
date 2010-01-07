@@ -273,6 +273,29 @@ void draw_tex_font_char( tex_font_metrics_t *tfm, char c )
 
     cd = find_char_data( tfm, c );
 
+#ifdef WEBOS
+      {
+  const GLfloat texCoords[8] = {
+	    cd->tex_ll.x, cd->tex_ll.y,
+	    cd->tex_lr.x, cd->tex_lr.y,
+	    cd->tex_ur.x, cd->tex_ur.y,
+	    cd->tex_ul.x, cd->tex_ul.y,
+  };
+
+  const GLfloat vertexCoords[8] = {
+	    cd->ll.x, cd->ll.y,
+	    cd->lr.x, cd->lr.y,
+	    cd->ur.x, cd->ur.y,
+	    cd->ul.x, cd->ul.y,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+  }
+#else
     glBegin( GL_QUADS );
     {
 	glTexCoord2dv( (scalar_t*) &cd->tex_ll );
@@ -285,6 +308,7 @@ void draw_tex_font_char( tex_font_metrics_t *tfm, char c )
 	glVertex2dv(   (scalar_t*) &cd->ul     );
     }
     glEnd();
+#endif
 
     glTranslatef( cd->kern_width, 0., 0. );
 }

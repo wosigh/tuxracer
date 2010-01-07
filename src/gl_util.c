@@ -67,8 +67,10 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -84,15 +86,19 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glEnable( GL_TEXTURE_GEN_S );
 	glEnable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
+#ifndef WEBOS
 	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+#endif
         break;
 
     case TEXFONT:
@@ -104,8 +110,10 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -121,8 +129,10 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -138,8 +148,10 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -155,15 +167,19 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glEnable( GL_TEXTURE_GEN_S );
 	glEnable( GL_TEXTURE_GEN_T );
+#endif
 	glEnable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LEQUAL );
 
+#ifndef WEBOS
 	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+#endif
 	break;
 
     case TREES:
@@ -175,8 +191,10 @@ void set_gl_options( RenderMode mode )
         glEnable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -194,8 +212,10 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -213,8 +233,10 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -231,8 +253,10 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_FALSE );
 	glShadeModel( GL_SMOOTH );
@@ -248,8 +272,10 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -265,8 +291,10 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -317,8 +345,10 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
 	glDisable( GL_COLOR_MATERIAL );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDepthMask( GL_FALSE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LEQUAL );
@@ -333,8 +363,10 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
+#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
+#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -389,9 +421,11 @@ void init_glfloat_array( int num, GLfloat arr[], ... )
     va_end( args );
 }
 
+#ifndef WEBOS
 /* Extension func ptrs *must* be initialized to NULL */
 PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p = NULL;
 PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p = NULL;
+#endif
 
 typedef void (*(*get_gl_proc_fptr_t)(const GLubyte *))(); 
 
@@ -409,6 +443,7 @@ void init_opengl_extensions()
     get_gl_proc = NULL;
 #endif
 
+#ifndef WEBOS
     if ( get_gl_proc ) {
 	glLockArraysEXT_p = (PFNGLLOCKARRAYSEXTPROC) 
 	    (*get_gl_proc)( (GLubyte*) "glLockArraysEXT" );
@@ -426,7 +461,9 @@ void init_opengl_extensions()
 	    glLockArraysEXT_p = NULL;
 	    glUnlockArraysEXT_p = NULL;
 	}
-    } else {
+    } else
+#endif 
+    {
 	print_debug( DEBUG_GL_EXT, 
 		     "No function available for obtaining GL proc addresses" );
     }
@@ -453,7 +490,9 @@ gl_value_t gl_values[] = {
     { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_INT },
     { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_INT },
     { "max texture size", GL_MAX_TEXTURE_SIZE, GL_INT },
+#ifndef WEBOS
     { "double buffering", GL_DOUBLEBUFFER, GL_UNSIGNED_BYTE },
+#endif
     { "red bits", GL_RED_BITS, GL_INT },
     { "green bits", GL_GREEN_BITS, GL_INT },
     { "blue bits", GL_BLUE_BITS, GL_INT },

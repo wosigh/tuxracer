@@ -49,6 +49,7 @@ extern "C"
 
 /* Shouldn't need to include glext.h if gl.h is recent, but alas we can't
  * count on that...  */
+#ifndef HAVE_SDL_OPENGLES
 #include <GL/glext.h>
 
 #if !defined(GL_GLEXT_VERSION) || GL_GLEXT_VERSION < 6
@@ -57,6 +58,7 @@ extern "C"
 
 extern PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p;
 extern PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p;
+#endif
 
 typedef enum {
     GUI,

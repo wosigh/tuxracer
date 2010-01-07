@@ -101,6 +101,42 @@ static void draw_tri( triangle_t *tri, scalar_t alpha )
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, c);
 
+#ifdef WEBOS
+    {
+    GLfloat t[8];
+    GLfloat v[12];
+
+    nml = find_course_normal( tri->p[0].x, tri->p[0].z );
+    glNormal3f( nml.x, nml.y, nml.z );
+    t[0]=tri->t[0].x;
+    t[1]=tri->t[0].y;
+    v[0]=tri->p[0].x;
+    v[1]=tri->p[0].y;
+    v[2]=tri->p[0].z;
+    
+    nml = find_course_normal( tri->p[1].x, tri->p[1].z );
+    glNormal3f( nml.x, nml.y, nml.z );
+    t[2]=tri->t[1].x;
+    t[3]=tri->t[1].y;
+    v[3]=tri->p[1].x;
+    v[4]=tri->p[1].y;
+    v[5]=tri->p[1].z;
+    
+    nml = find_course_normal( tri->p[2].x, tri->p[2].z );
+    glNormal3f( nml.x, nml.y, nml.z );
+    t[4]=tri->t[2].x;
+    t[5]=tri->t[2].y;
+    v[6]=tri->p[2].x;
+    v[7]=tri->p[2].y;
+    v[8]=tri->p[2].z;
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, v);
+  glTexCoordPointer(2, GL_FLOAT, 0, t);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+#else
     glBegin(GL_TRIANGLES);
 
     nml = find_course_normal( tri->p[0].x, tri->p[0].z );
@@ -119,6 +155,7 @@ static void draw_tri( triangle_t *tri, scalar_t alpha )
     glVertex3f( tri->p[2].x, tri->p[2].y, tri->p[2].z );
 
     glEnd();
+#endif
 }
 
 static void draw_tri_tracks( void )
@@ -378,6 +415,56 @@ void draw_track_marks(void)
 	glBindTexture( GL_TEXTURE_2D, texid[q->track_type] );
 
 	if ((q->track_type == TRACK_HEAD) || (q->track_type == TRACK_TAIL)) { 
+#ifdef WEBOS
+    {
+    GLfloat t[8];
+    GLfloat v[12];
+
+	    glNormal3f( q->n1.x, q->n1.y, q->n1.z );
+	    glTexCoord2f( q->t1.x, q->t1.y );
+	    glVertex3f( q->v1.x, q->v1.y, q->v1.z );
+    t[0]=q->t1.x;
+    t[1]=q->t1.y;
+    v[0]=q->v1.x;
+    v[1]=q->v1.y;
+    v[2]=q->v1.z;
+    
+	
+	    glNormal3f( q->n2.x, q->n2.y, q->n2.z );
+	    glTexCoord2f( q->t2.x, q->t2.y );
+	    glVertex3f( q->v2.x, q->v2.y, q->v2.z );
+    t[2]=q->t2.x;
+    t[3]=q->t2.y;
+    v[3]=q->v2.x;
+    v[4]=q->v2.y;
+    v[5]=q->v2.z;
+    
+
+	    glNormal3f( q->n4.x, q->n4.y, q->n4.z );
+	    glTexCoord2f( q->t4.x, q->t4.y );
+	    glVertex3f( q->v4.x, q->v4.y, q->v4.z );
+    t[4]=q->t4.x;
+    t[5]=q->t4.y;
+    v[6]=q->v4.x;
+    v[7]=q->v4.y;
+    v[8]=q->v4.z;
+	
+	    glNormal3f( q->n3.x, q->n3.y, q->n3.z );
+	    glTexCoord2f( q->t3.x, q->t3.y );
+	    glVertex3f( q->v3.x, q->v3.y, q->v3.z );
+    t[5]=q->t3.x;
+    t[7]=q->t3.y;
+    v[9]=q->v3.x;
+    v[10]=q->v3.y;
+    v[11]=q->v3.z;
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, v);
+  glTexCoordPointer(2, GL_FLOAT, 0, t);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+    }
+#else
 	    glBegin(GL_QUADS);
 	    
 	    glNormal3f( q->n1.x, q->n1.y, q->n1.z );
@@ -397,9 +484,60 @@ void draw_track_marks(void)
 	    glVertex3f( q->v3.x, q->v3.y, q->v3.z );
 	
 	    glEnd();
+#endif
 
 	} else {
 	      
+#ifdef WEBOS
+    {
+      printf("HOw about I fix this section!\n");
+    //FIXME - lazy
+   #if 0
+    GLfloat t[8];
+    GLfloat v[12];
+
+	    glNormal3f( q->n2.x, q->n2.y, q->n2.z );
+	    glTexCoord2f( q->t2.x, q->t2.y );
+	    glVertex3f( q->v2.x, q->v2.y, q->v2.z );
+
+	    glNormal3f( q->n1.x, q->n1.y, q->n1.z );
+	    glTexCoord2f( q->t1.x, q->t1.y );
+	    glVertex3f( q->v1.x, q->v1.y, q->v1.z );
+
+	    glNormal3f( q->n4.x, q->n4.y, q->n4.z );
+	    glTexCoord2f( q->t4.x, q->t4.y );
+	    glVertex3f( q->v4.x, q->v4.y, q->v4.z );
+
+	    glNormal3f( q->n3.x, q->n3.y, q->n3.z );
+	    glTexCoord2f( q->t3.x, q->t3.y );
+	    glVertex3f( q->v3.x, q->v3.y, q->v3.z );
+
+
+	    qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
+	    while (( qnext->track_type == TRACK_MARK ) && (current_quad+1 < num_quads)) {
+		current_quad++;
+		q = &track_marks.quads[(first_quad+current_quad)%MAX_TRACK_MARKS];
+		track_colour.a = qnext->alpha;
+		set_material( track_colour, black, 1.0 );
+
+		glNormal3f( q->n4.x, q->n4.y, q->n4.z );
+		glTexCoord2f( q->t4.x, q->t4.y );
+		glVertex3f( q->v4.x, q->v4.y, q->v4.z );
+
+		glNormal3f( q->n3.x, q->n3.y, q->n3.z );
+		glTexCoord2f( q->t3.x, q->t3.y );
+		glVertex3f( q->v3.x, q->v3.y, q->v3.z );
+		
+		qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
+	    }
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, v);
+  glTexCoordPointer(2, GL_FLOAT, 0, t);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+#endif
+    }
+#else
 	    glBegin(GL_QUAD_STRIP);
 
 	    glNormal3f( q->n2.x, q->n2.y, q->n2.z );
@@ -437,6 +575,7 @@ void draw_track_marks(void)
 		qnext = &track_marks.quads[(first_quad+current_quad+1)%MAX_TRACK_MARKS];
 	    }
 	    glEnd();
+#endif
 	}
 
     }

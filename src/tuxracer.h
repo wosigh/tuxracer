@@ -99,8 +99,18 @@
 #endif
 
 /* OpenGL */
+#define HAVE_SDL_OPENGLES
+#ifdef HAVE_SDL_OPENGLES
+#include <SDL/SDL_opengles.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
+
+#define WEBOS
+#ifdef WEBOS
+#include <webos.h>
+#endif
 
 #ifdef HAVE_GL_GLX_H
 #   include <GL/glx.h>

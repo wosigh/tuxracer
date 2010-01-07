@@ -692,6 +692,29 @@ static void set_widget_positions_and_draw_decorations()
 		    ur = make_point2d( 1, 0.5 );
 		}
 
+#ifdef WEBOS
+    {
+  const GLfloat texCoords[8] = {
+    ll.x, ll.y,
+    ur.x, ll.y,
+    ur.x, ur.y,
+    ll.x, ur.y,
+  };
+
+  const GLfloat vertexCoords[8] = {
+    0, 0,
+    32, 0,
+    32, 32,
+    0, 32,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+  }
+#else
 		glBegin( GL_QUADS );
 		{
 		    glTexCoord2f( ll.x, ll.y );
@@ -707,6 +730,7 @@ static void set_widget_positions_and_draw_decorations()
 		    glVertex2f( 0, 32 );
 		}
 		glEnd();
+#endif
 
 		glTranslatef( 36, 0, 0 );
 	    }
@@ -758,6 +782,20 @@ static void set_widget_positions_and_draw_decorations()
     glDisable( GL_TEXTURE_2D );
 
     glColor4f( 1.0, 1.0, 1.0, 1.0 );
+#ifdef WEBOS
+    {
+  const GLfloat vertexCoords[8] = {
+	  x_org+box_width-140, y_org+66,
+	  x_org+box_width, y_org+66,
+	  x_org+box_width, y_org+66+107,
+	  x_org+box_width-140, y_org+66+107,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  }
+#else
     glBegin( GL_QUADS );
     {
 	glVertex2f( x_org+box_width-140, y_org+66 );
@@ -766,6 +804,7 @@ static void set_widget_positions_and_draw_decorations()
 	glVertex2f( x_org+box_width-140, y_org+66+107 );
     }
     glEnd();
+#endif
 
     glEnable( GL_TEXTURE_2D );
 
@@ -777,6 +816,30 @@ static void set_widget_positions_and_draw_decorations()
 
     glBindTexture( GL_TEXTURE_2D, texobj );
 
+#ifdef WEBOS
+    {
+  const GLfloat texCoords[8] = {
+	  0, 0,
+	  1, 0,
+	  1, 1,
+	  0, 1,
+  };
+
+  const GLfloat vertexCoords[8] = {
+	  x_org+box_width-136, y_org+70,
+	  x_org+box_width-4, y_org+70,
+	  x_org+box_width-4, y_org+70+99,
+	  x_org+box_width-136, y_org+70+99,
+  };
+
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+  }
+#else
     glBegin( GL_QUADS );
     {
 	glTexCoord2d( 0, 0);
@@ -792,6 +855,7 @@ static void set_widget_positions_and_draw_decorations()
 	glVertex2f( x_org+box_width-136, y_org+70+99 );
     }
     glEnd();
+#endif
 }
 
 

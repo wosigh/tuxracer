@@ -154,6 +154,7 @@ void draw_sphere( int num_divisions )
 
 #endif /* USE_GLUSPHERE */
 
+#ifndef WEBOS
 static GLuint get_sphere_display_list( int divisions ) {
     static bool_t initialized = False;
     static int num_display_lists;
@@ -192,6 +193,7 @@ static GLuint get_sphere_display_list( int divisions ) {
 
     return display_lists[idx];
 }
+#endif
 
 
 
@@ -216,12 +218,16 @@ void traverse_dag( scene_node_t *node, material_t *mat )
         set_material( mat->diffuse, mat->specular_colour, 
                      mat->specular_exp );
 
+#ifndef WEBOS
 	if ( getparam_use_sphere_display_list() ) {
 	    glCallList( get_sphere_display_list( 
 		node->param.sphere.divisions ) );
 	} else {
+#endif
 	    draw_sphere( node->param.sphere.divisions );
+#ifndef WEBOS
 	}
+#endif
     } 
 
     child = node->child;

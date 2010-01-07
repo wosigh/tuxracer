@@ -244,6 +244,27 @@ void draw_ui_snow( void )
 	    glPushMatrix();
 	    {
 		glTranslatef( pt->x*xres, pt->y*yres, 0 );
+#ifdef WEBOS
+    GLfloat t[8] = {
+		    tex_min->x, tex_min->y,
+		    tex_max->x, tex_min->y,
+		    tex_max->x, tex_max->y,
+		    tex_min->x, tex_max->y,
+    };
+
+    GLfloat v[8] = {
+		    0, 0,
+		    size, 0,
+		    size, size,
+		    0, size,
+    };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, v);
+  glTexCoordPointer(2, GL_FLOAT, 0, t);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+#else
 		glBegin( GL_QUADS );
 		{
 		    glTexCoord2f( tex_min->x, tex_min->y );
@@ -256,6 +277,7 @@ void draw_ui_snow( void )
 		    glVertex2f( 0, size );
 		}
 		glEnd();
+#endif
 	    }
 	    glPopMatrix();
 	} 

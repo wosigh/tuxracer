@@ -275,8 +275,19 @@ void setup_course_tex_gen()
 {
     static GLfloat xplane[4] = { 1.0 / TEX_SCALE, 0.0, 0.0, 0.0 };
     static GLfloat zplane[4] = { 0.0, 0.0, 1.0 / TEX_SCALE, 0.0 };
+#ifdef WEBOS
+    GLfloat m[4][4] = { 
+      { xplane[0], zplane[0], 0, 0 },
+      { xplane[1], zplane[1], 0, 0 },
+      { xplane[2], zplane[2], 0, 0 },
+      { xplane[3], zplane[3], 0, 0 }
+    };
+    glLoadMatrixf((GLfloat *)m);
+    glMatrixMode(GL_MODELVIEW);
+#else
     glTexGenfv( GL_S, GL_OBJECT_PLANE, xplane );
     glTexGenfv( GL_T, GL_OBJECT_PLANE, zplane );
+#endif
 }
 
 #define DRAW_POINT \
@@ -326,6 +337,29 @@ void draw_sky(point_t pos)
   glBindTexture( GL_TEXTURE_2D, texture_id[0] );
   glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
 
+#ifdef WEBOS
+  {
+  const GLfloat texCoords[8] = {
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+  };
+
+  const GLfloat vertexCoords[12] = {
+    -1, -1, -1,
+     1, -1, -1,
+     1,  1, -1,
+    -1,  1, -1,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  }
+#else
   glBegin(GL_QUADS);
   glTexCoord2f( 0.0, 0.0 );
   glVertex3f( -1, -1, -1);
@@ -336,10 +370,34 @@ void draw_sky(point_t pos)
   glTexCoord2f( 0.0, 1.0 );
   glVertex3f( -1,  1, -1);
   glEnd();
+#endif
 
   glBindTexture( GL_TEXTURE_2D, texture_id[1] );
   glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
 
+#ifdef WEBOS
+  {
+  const GLfloat texCoords[8] = {
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+  };
+
+  const GLfloat vertexCoords[12] = {
+    -1,  1, -1,
+     1,  1, -1,
+     1,  1,  1,
+    -1,  1,  1,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  }
+#else
   glBegin(GL_QUADS);
   glTexCoord2f( 0.0, 0.0 );
   glVertex3f( -1,  1, -1);
@@ -350,10 +408,35 @@ void draw_sky(point_t pos)
   glTexCoord2f( 0.0, 1.0 );
   glVertex3f( -1,  1,  1);
   glEnd();
+#endif
 
   glBindTexture( GL_TEXTURE_2D, texture_id[2] );
   glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
 
+#ifdef WEBOS
+  {
+  const GLfloat texCoords[8] = {
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+  };
+
+  const GLfloat vertexCoords[12] = {
+    -1, -1,  1,
+     1, -1,  1,
+     1, -1, -1,
+    -1, -1, -1,
+  };
+
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  }
+#else
   glBegin(GL_QUADS);
   glTexCoord2f( 0.0, 0.0 );
   glVertex3f( -1, -1,  1);
@@ -364,11 +447,35 @@ void draw_sky(point_t pos)
   glTexCoord2f( 0.0, 1.0 );
   glVertex3f( -1, -1, -1);
   glEnd();
+#endif
 
 
   glBindTexture( GL_TEXTURE_2D, texture_id[3] );
   glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
 
+#ifdef WEBOS
+  {
+  const GLfloat texCoords[8] = {
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+  };
+
+  const GLfloat vertexCoords[12] = {
+    -1, -1,  1,
+    -1, -1, -1,
+    -1,  1, -1,
+    -1,  1,  1,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  }
+#else
   glBegin(GL_QUADS);
   glTexCoord2f( 0.0, 0.0 );
   glVertex3f( -1, -1,  1);
@@ -379,11 +486,35 @@ void draw_sky(point_t pos)
   glTexCoord2f( 0.0, 1.0 );
   glVertex3f( -1,  1,  1);
   glEnd();
+#endif
 
 
   glBindTexture( GL_TEXTURE_2D, texture_id[4] );
   glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
 
+#ifdef WEBOS
+  {
+  const GLfloat texCoords[8] = {
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+  };
+
+  const GLfloat vertexCoords[12] = {
+     1, -1, -1,
+     1, -1,  1,
+     1,  1,  1,
+     1,  1, -1,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  }
+#else
   glBegin(GL_QUADS);
   glTexCoord2f( 0.0, 0.0 );
   glVertex3f(  1, -1, -1);
@@ -394,11 +525,35 @@ void draw_sky(point_t pos)
   glTexCoord2f( 0.0, 1.0 );
   glVertex3f(  1,  1, -1);
   glEnd();
+#endif
 
 
   glBindTexture( GL_TEXTURE_2D, texture_id[5] );
   glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
 
+#ifdef WEBOS
+  {
+  const GLfloat texCoords[8] = {
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+  };
+
+  const GLfloat vertexCoords[12] = {
+     1, -1,  1,
+    -1, -1,  1,
+    -1,  1,  1,
+     1,  1,  1,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  }
+#else
   glBegin(GL_QUADS);
   glTexCoord2f( 0.0, 0.0 );
   glVertex3f(  1, -1,  1);
@@ -409,6 +564,7 @@ void draw_sky(point_t pos)
   glTexCoord2f( 0.0, 1.0 );
   glVertex3f(  1,  1,  1);
   glEnd();
+#endif
 
 
   glPopMatrix();
@@ -482,6 +638,16 @@ void draw_trees()
 
 	glNormal3f( normal.x, normal.y, normal.z );
 
+#ifdef WEBOS // EJG: From iphone TRWC
+        glScalef(treeRadius, treeHeight, treeRadius);
+        
+        int drawTwoPlanes = 0;
+        if ( !clip_course ||
+            eye_pt.z - treeLocs[i].ray.pt.z < fwd_tree_detail_limit )
+            drawTwoPlanes = 6;
+        
+        glDrawArrays(GL_TRIANGLES, 0, 6 + drawTwoPlanes);
+#else
         glBegin( GL_QUADS );
         glTexCoord2f( 0., 0. );
         glVertex3f( -treeRadius, 0.0, 0.0 );
@@ -506,6 +672,7 @@ void draw_trees()
 	}
 
         glEnd();
+#endif
         glPopMatrix();
     } 
 
@@ -561,6 +728,10 @@ void draw_trees()
 	    normal.y = 0.0;
 	    normalize_vector( &normal );
 
+#ifdef WEBOS // EJG: From iphone TRWC
+			glScalef(itemRadius*normal.z, itemHeight, itemRadius*normal.x);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+#else
 	    glBegin( GL_QUADS );
 	    {
 		glTexCoord2f( 0., 0. );
@@ -581,6 +752,7 @@ void draw_trees()
 			    itemRadius*normal.x );
 	    }
 	    glEnd();
+#endif
 	}
         glPopMatrix();
     } 
@@ -692,6 +864,7 @@ void draw_fog_plane()
     right_vec = subtract_points( top_right_pt, right_pt );
 
 
+#ifndef WEBOS //EJG: Forget the 'fog plane' for now, port later
     /* Now draw the fog plane */
 
     set_gl_options( FOG_PLANE );
@@ -724,4 +897,5 @@ void draw_fog_plane()
     glVertex3f( pt.x, pt.y, pt.z );
 
     glEnd();
+#endif
 }

@@ -532,6 +532,28 @@ static void ui_draw_cursor( void )
 
     glBindTexture( GL_TEXTURE_2D, texobj );
 
+#ifdef WEBOS
+    GLfloat t[8] = {
+      0,1,
+      0,0,
+      1,0,
+      1,1,
+    };
+
+    GLfloat v[8] = {
+      cursor_pos.x, cursor_pos.y,
+	    cursor_pos.x, cursor_pos.y - CURSOR_TEX_SIZE,
+	    cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y - CURSOR_TEX_SIZE,
+	    cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y,
+    };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, v);
+  glTexCoordPointer(2, GL_FLOAT, 0, t);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+
+#else
     glBegin( GL_QUADS );
     {
 	glTexCoord2f( 0, 1 );
@@ -552,6 +574,7 @@ static void ui_draw_cursor( void )
 
     }
     glEnd();
+#endif
 }
 
 

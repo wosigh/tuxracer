@@ -211,6 +211,37 @@ static void set_widget_positions_and_draw_decorations()
     glBindTexture( GL_TEXTURE_2D, texobj );
 
 
+#ifdef WEBOS
+    {
+	point2d_t tll, tur;
+	point2d_t ll, ur;
+
+	ll = make_point2d( x_org, y_org + 193 );
+	ur = make_point2d( x_org + 44, y_org + 193 + 44 );
+	tll = make_point2d( 0, 0 );
+	tur = make_point2d( 44.0/64.0, 44.0/64.0 );
+
+  const GLfloat texCoords[8] = {
+	  tll.x, tll.y,
+	  tur.x, tll.y,
+	  tur.x, tur.y,
+	  tll.x, tur.y,
+  };
+
+  const GLfloat vertexCoords[8] = {
+	  ll.x, ll.y,
+	  ur.x, ll.y,
+	  ur.x, ur.y,
+	  ll.x, ur.y,
+  };  
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+    }
+#else
     glBegin( GL_QUADS );
     {
 	point2d_t tll, tur;
@@ -234,6 +265,7 @@ static void set_widget_positions_and_draw_decorations()
 	glVertex2f( ll.x, ur.y );
     }
     glEnd();
+#endif
 
     if ( !get_texture_binding( 
 	get_cup_icon_texture_binding( 
@@ -244,6 +276,37 @@ static void set_widget_positions_and_draw_decorations()
 
     glBindTexture( GL_TEXTURE_2D, texobj );
 
+#ifdef WEBOS
+    {
+	point2d_t tll, tur;
+	point2d_t ll, ur;
+
+	ll = make_point2d( x_org, y_org + 103 );
+	ur = make_point2d( x_org + 44, y_org + 103 + 44 );
+	tll = make_point2d( 0, 0 );
+	tur = make_point2d( 44.0/64.0, 44.0/64.0 );
+
+  const GLfloat texCoords[8] = {
+	  tll.x, tll.y,
+	  tur.x, tll.y,
+	  tur.x, tur.y,
+	  tll.x, tur.y,
+  };
+
+  const GLfloat vertexCoords[8] = {
+	  ll.x, ll.y,
+	  ur.x, ll.y,
+	  ur.x, ur.y,
+	  ll.x, ur.y,
+  };  
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+    }
+#else
     glBegin( GL_QUADS );
     {
 	point2d_t tll, tur;
@@ -267,6 +330,7 @@ static void set_widget_positions_and_draw_decorations()
 	glVertex2f( ll.x, ur.y );
     }
     glEnd();
+#endif
 
     if ( !get_font_binding( "menu_label", &font ) ) {
 	print_warning( IMPORTANT_WARNING,

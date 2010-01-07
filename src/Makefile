@@ -67,10 +67,10 @@ RANLIB = ranlib
 SDL_CFLAGS = -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 SDL_CONFIG = /usr/local/bin/sdl-config
 SDL_LIBS = -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread
-TR_CFLAGS = -O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+TR_CFLAGS = -O2 -Werror -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 TR_CPPFLAGS =  -DTUXRACER_NO_ASSERT=1 -I/usr/local/include/tcl8.3 -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1
-TR_CXXFLAGS = -O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
-TR_LIBS =  -ldl -lm  -ltcl8.3 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLESv2
+TR_CXXFLAGS = -O2 -Werror -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+TR_LIBS =  -ldl -lm  -ltcl8.3 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLESv2 -lGLES_CM
 VERSION = 0.61
 
 bin_PROGRAMS = tuxracer
@@ -86,7 +86,7 @@ PROGRAMS =  $(bin_PROGRAMS)
 DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I..
 CPPFLAGS =    -DTUXRACER_NO_ASSERT=1 -I/usr/local/include/tcl8.3 -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1  -DTUXRACER_NO_ASSERT=1 -I/usr/local/include/tcl8.3 -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1
 LDFLAGS = -Wl,-rpath,/usr/local/lib -L/usr/local/lib
-LIBS =   -ldl -lm  -ltcl8.3 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLESv2
+LIBS =   -ldl -lm  -ltcl8.3 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLESv2 -lGLES_CM
 X_CFLAGS = 
 X_LIBS = 
 X_EXTRA_LIBS = 
@@ -107,11 +107,11 @@ winsys.o
 tuxracer_LDADD = $(LDADD)
 tuxracer_DEPENDENCIES = 
 tuxracer_LDFLAGS = 
-CXXFLAGS =  -O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+CXXFLAGS =  -O2 -Werror -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
-CFLAGS =  -O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+CFLAGS =  -O2 -Werror -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@

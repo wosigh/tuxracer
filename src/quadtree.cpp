@@ -103,16 +103,16 @@ quadsquare::quadsquare(quadcornerdata* pcd)
 	print_debug( DEBUG_QUADTREE, "initializing root node" );
 
 	// Initialize texture data
-	if (!get_texture_binding("snow", &(TexId[Snow]))) {
+	if (!get_texture_binding((char*)"snow", &(TexId[Snow]))) {
 	    TexId[Snow] = 0;
 	}
-	if (!get_texture_binding("ice", &TexId[Ice])) {
+	if (!get_texture_binding((char*)"ice", &TexId[Ice])) {
 	    TexId[Ice] = 0;
 	}
-	if (!get_texture_binding("rock", &TexId[Rock])) {
+	if (!get_texture_binding((char*)"rock", &TexId[Rock])) {
 	    TexId[Rock] = 0;
 	}
-	if ( !get_texture_binding( "terrain_envmap", &EnvmapTexId ) ) {
+	if ( !get_texture_binding( (char*)"terrain_envmap", &EnvmapTexId ) ) {
 	    EnvmapTexId = 0;
 	}
 
@@ -995,6 +995,10 @@ GLubyte *VNCArray;
 
 void quadsquare::DrawTris()
 {
+#ifdef WEBOS
+	glDrawElements( GL_TRIANGLES, VertexArrayCounter,
+				   GL_UNSIGNED_INT, VertexArrayIndices );
+#else
     int tmp_min_idx = VertexArrayMinIdx;
     if ( glLockArraysEXT_p && getparam_use_cva() ) {
 
@@ -1017,21 +1021,26 @@ void quadsquare::DrawTris()
     if ( glUnlockArraysEXT_p && getparam_use_cva() ) {
 	glUnlockArraysEXT_p();
     }
+#endif
 }
 
 void quadsquare::DrawEnvmapTris() 
 {
     if ( VertexArrayCounter > 0 && EnvmapTexId != 0 ) {
 	
+#ifndef WEBOS // EJG: Seems like I should do something here?
 	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
+#endif
 
 	glBindTexture( GL_TEXTURE_2D, EnvmapTexId );
 
 	DrawTris();
 
+#ifndef WEBOS
 	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+#endif
 
     } 
 }

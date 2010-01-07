@@ -147,6 +147,46 @@ void draw_billboard( player_data_t *plyr,
 	z_vec.z = plyr->view.inv_view_mat[2][2];
     }
 
+#ifdef WEBOS
+  GLfloat texCoords[8];
+  GLfloat vertexCoords[12];
+    
+	pt = move_point( center_pt, scale_vector( -width/2.0, x_vec ) );
+	pt = move_point( pt, scale_vector( -height/2.0, y_vec ) );
+	glNormal3f( z_vec.x, z_vec.y, z_vec.z );
+  texCoords[0]=min_tex_coord.x;
+  texCoords[1]=min_tex_coord.y;
+  vertexCoords[0]=pt.x;
+  vertexCoords[1]=pt.y;
+  vertexCoords[2]=pt.z;
+
+	pt = move_point( pt, scale_vector( width, x_vec ) );
+  texCoords[2]=max_tex_coord.x;
+  texCoords[3]=max_tex_coord.y;
+  vertexCoords[3]=pt.x;
+  vertexCoords[4]=pt.y;
+  vertexCoords[5]=pt.z;
+
+	pt = move_point( pt, scale_vector( height, y_vec ) );
+  texCoords[4]=max_tex_coord.x;
+  texCoords[5]=max_tex_coord.y;
+  vertexCoords[6]=pt.x;
+  vertexCoords[7]=pt.y;
+  vertexCoords[8]=pt.z;
+
+	pt = move_point( pt, scale_vector( -width, x_vec ) );
+  texCoords[6]=min_tex_coord.x;
+  texCoords[7]=min_tex_coord.y;
+  vertexCoords[9]=pt.x;
+  vertexCoords[10]=pt.y;
+  vertexCoords[11]=pt.z;
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+#else
     glBegin( GL_QUADS );
     {
 	pt = move_point( center_pt, scale_vector( -width/2.0, x_vec ) );
@@ -168,4 +208,5 @@ void draw_billboard( player_data_t *plyr,
 	glVertex3f( pt.x, pt.y, pt.z );
     }
     glEnd();
+#endif
 }

@@ -122,6 +122,9 @@ void mouse_cb( int button, int state, int x, int y )
 */
 static void draw_credits_text( scalar_t time_step )
 {
+#ifdef WEBOS // EJG: Credits?  I just want to play!
+  printf("Credits are scrolling right now...\n");
+#else
     int w = getparam_x_resolution();
     int h = getparam_y_resolution();
     font_t *font;
@@ -209,6 +212,7 @@ static void draw_credits_text( scalar_t time_step )
     glColor4f( 1, 1, 1, 1 );
 
     glEnable( GL_TEXTURE_2D );
+#endif
 }
 
 static void credits_init(void) 

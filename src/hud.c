@@ -204,6 +204,29 @@ static void draw_herring_count( int herring_count )
 		      getparam_y_resolution() - HERRING_ICON_Y_OFFSET - asc, 
 		      0 );
 
+#ifdef WEBOS
+  {
+  const GLfloat texCoords[8] = {
+    0, 0,
+	  (GLfloat) HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, 0,
+		(GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE,
+		0, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE,
+  };
+
+  const GLfloat vertexCoords[8] = {
+    0, 0,
+	  HERRING_ICON_WIDTH, 0,
+	  HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT,
+	  0, HERRING_ICON_HEIGHT,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+  }
+#else
 	glBegin( GL_QUADS );
 	{
 	    glTexCoord2f( 0, 0 );
@@ -224,6 +247,7 @@ static void draw_herring_count( int herring_count )
 	    glVertex2f( 0, HERRING_ICON_HEIGHT );
 	}
 	glEnd();
+#endif
 
 	
 	bind_font_texture( font );
@@ -252,17 +276,31 @@ point2d_t calc_new_fan_pt( scalar_t angle )
     return pt;
 }
 
+#ifdef WEBOS
+GLfloat *hudTriFanVert = NULL;
+#endif
+
 void start_tri_fan()
 {
     point2d_t pt;
 
+#ifdef WEBOS
+    hudTriFanVert[0] = ENERGY_GAUGE_CENTER_X;
+    hudTriFanVert[1] = ENERGY_GAUGE_CENTER_Y;
+#else
     glBegin( GL_TRIANGLE_FAN );
     glVertex2f( ENERGY_GAUGE_CENTER_X, 
 		ENERGY_GAUGE_CENTER_Y );
+#endif
 
     pt = calc_new_fan_pt( SPEEDBAR_BASE_ANGLE ); 
 
+#ifdef WEBOS
+    hudTriFanVert[2] = pt.x;
+    hudTriFanVert[3] = pt.y;
+#else
     glVertex2f( pt.x, pt.y );
+#endif
 }
 
 void draw_partial_tri_fan( scalar_t fraction )
@@ -282,6 +320,7 @@ void draw_partial_tri_fan( scalar_t fraction )
 
     angle_incr = 360.0 / CIRCLE_DIVISIONS;
 
+    hudTriFanVert = malloc((divs + 1) * 2 * sizeof (GLfloat));
     for (i=0; i<divs; i++) {
 	if ( !trifan ) {
 	    start_tri_fan();
@@ -292,7 +331,12 @@ void draw_partial_tri_fan( scalar_t fraction )
 
 	pt = calc_new_fan_pt( cur_angle );
 
+#ifdef WEBOS
+  hudTriFanVert[(i*2)+2] = pt.x;
+  hudTriFanVert[(i*2)+3] = pt.x;
+#else
 	glVertex2f( pt.x, pt.y );
+#endif
     }
 
     if ( cur_angle > angle + EPS ) {
@@ -304,11 +348,22 @@ void draw_partial_tri_fan( scalar_t fraction )
 
 	pt = calc_new_fan_pt( cur_angle );
 
+#ifdef WEBOS
+  hudTriFanVert[(divs*2)+2] = pt.x;
+  hudTriFanVert[(divs*2)+3] = pt.y;
+#else
 	glVertex2f( pt.x, pt.y );
+#endif
     }
 
     if ( trifan ) {
+#ifdef WEBOS
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, hudTriFanVert);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, divs + 1);
+#else
 	glEnd();
+#endif
 	trifan = False;
     }
 }
@@ -363,8 +418,21 @@ void draw_gauge( scalar_t speed, scalar_t energy )
     }
 
 
+#ifdef WEBOS
+    {
+    GLfloat m[4][4] = { 
+      { xplane[0], yplane[0], 0, 0 },
+      { xplane[1], yplane[1], 0, 0 },
+      { xplane[2], yplane[2], 0, 0 },
+      { xplane[3], yplane[3], 0, 0 }
+    };
+    glLoadMatrixf((GLfloat *)m);
+    glMatrixMode(GL_MODELVIEW);
+    }
+#else
     glTexGenfv( GL_S, GL_OBJECT_PLANE, xplane );
     glTexGenfv( GL_T, GL_OBJECT_PLANE, yplane );
+#endif
 
     glPushMatrix();
     {
@@ -378,6 +446,20 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 
 	y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
 
+#ifdef WEBOS
+  {
+  const GLfloat vertexCoords[8] = {
+	  0.0, y,
+	  GAUGE_IMG_SIZE, y,
+	  GAUGE_IMG_SIZE, GAUGE_IMG_SIZE,
+	  0.0, GAUGE_IMG_SIZE,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+  }
+#else
 	glBegin( GL_QUADS );
 	{
 	    glVertex2f( 0.0, y );
@@ -386,9 +468,24 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 	    glVertex2f( 0.0, GAUGE_IMG_SIZE );
 	}
 	glEnd();
+#endif
 
 	glColor4fv( energy_foreground_color );
 
+#ifdef WEBOS
+  {
+  const GLfloat vertexCoords[8] = {
+    0.0, 0.0,
+    GAUGE_IMG_SIZE, 0.0,
+    GAUGE_IMG_SIZE, y,
+    0.0, y,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+  }
+#else
 	glBegin( GL_QUADS );
 	{
 	    glVertex2f( 0.0, 0.0 );
@@ -397,6 +494,7 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 	    glVertex2f( 0.0, y );
 	}
 	glEnd();
+#endif
 
 
 	/* Calculate the fraction of the speed bar to fill */
@@ -445,6 +543,20 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 
 	glBindTexture( GL_TEXTURE_2D, outline_texobj );
 
+#ifdef WEBOS
+  {
+  const GLfloat vertexCoords[8] = {
+    0.0, 0.0,
+    GAUGE_IMG_SIZE, 0.0,
+    GAUGE_IMG_SIZE, GAUGE_IMG_SIZE,
+    0.0, GAUGE_IMG_SIZE,
+  };
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
+  glDrawArrays(GL_TRIANGLES, 0, 4);
+  }
+#else
 	glBegin( GL_QUADS );
 	{
 	    glVertex2f( 0.0, 0.0 );
@@ -453,6 +565,7 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 	    glVertex2f( 0.0, GAUGE_IMG_SIZE );
 	}
 	glEnd();
+#endif
 
 
 

@@ -4267,8 +4267,8 @@ done
 
 
 TR_CPPFLAGS=""
-TR_CFLAGS="-O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations"
-TR_CXXFLAGS="-O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations"
+TR_CFLAGS="-O2 -Werror -fomit-frame-pointer -ffast-math -fexpensive-optimizations"
+TR_CXXFLAGS="-O2 -Werror -fomit-frame-pointer -ffast-math -fexpensive-optimizations"
 TR_LIBS=""
 
 case "$host" in
@@ -4279,7 +4279,7 @@ esac
 
 # Check whether --enable-debug was given.
 if test "${enable_debug+set}" = set; then :
-  enableval=$enable_debug; TR_CFLAGS="-g -Wall"; TR_CXXFLAGS="-g -Wall"
+  enableval=$enable_debug; TR_CFLAGS="-g -Werror"; TR_CXXFLAGS="-g -Werror"
 else
   TR_CPPFLAGS="$TR_CPPFLAGS -DTUXRACER_NO_ASSERT=1"
 fi

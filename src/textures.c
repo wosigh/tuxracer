@@ -238,8 +238,13 @@ bool_t unbind_texture( char *binding )
 
 void get_current_texture_dimensions( int *width, int *height )
 {
+#ifdef WEBOS
+  printf("I can't get current texture dimensions!\n");
+  abort();
+#else
     glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, width );
     glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, height );
+#endif
 }
 
 bool_t flush_textures(void)
