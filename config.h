@@ -58,8 +58,6 @@
 /* Name of package */
 #define PACKAGE "tuxracer"
 
-#if 0
 /* Version number of package */
 #define VERSION "0.61"
-#endif
 

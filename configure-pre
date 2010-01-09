@@ -1,0 +1,3 @@
+#!/bin/sh
+
+LDFLAGS="-Wl,-rpath-link,/usr/local/lib -L/usr/local/lib" ./configure --with-sdl-prefix=/usr/local --with-tcl-lib-name=tcl8.6 --with-tcl-libs=`pwd`/tcl8.6a/lib --with-tcl-inc=`pwd`/tcl8.6a/include

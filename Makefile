@@ -61,16 +61,16 @@ host_alias =
 host_triplet = arm-none-linux-gnueabi
 CC = gcc
 CXX = g++
-MAKEINFO = /source/tuxrider_port/missing makeinfo
+MAKEINFO = /home/egaudet/webos-internals/tuxracer/missing makeinfo
 PACKAGE = tuxracer
 RANLIB = ranlib
 SDL_CFLAGS = -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 SDL_CONFIG = /usr/local/bin/sdl-config
 SDL_LIBS = -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread
-TR_CFLAGS = -O2 -Werror -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
-TR_CPPFLAGS =  -I/usr/local/include/tcl8.3 -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1
-TR_CXXFLAGS = -O2 -Werror -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
-TR_LIBS =  -ldl -lm  -ltcl8.3 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLES_CM
+TR_CFLAGS = -O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+TR_CPPFLAGS =  -DTUXRACER_NO_ASSERT=1 -I/home/egaudet/webos-internals/tuxracer/tcl8.6a/include -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1
+TR_CXXFLAGS = -O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+TR_LIBS =  -ldl -lm -L/home/egaudet/webos-internals/tuxracer/tcl8.6a/lib -ltcl8.6 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLES_CM -lpdl
 VERSION = 0.61
 
 SUBDIRS = src

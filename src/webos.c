@@ -118,24 +118,8 @@ void displayRankings()
 }
 
 void turnScreenToLandscape() {
-#if 0
-  int i,j;
-  printf("GO landscape?\n");
-  for (i=0; i<0x100; i++) {
-    printf("try %d\n", i);
-    for (j=0; j<0x100; j++) {
-      printf("j %d\n", j);
-    PDL_SetOrientation(i,j);
-    SDL_Delay(20);
-    }
-  }
-  glRotatef( -90.0, 0, 0, 1 );
-#else
-  printf("ROTATE!\n");
+  printf("Need to figure out how to use PDL_SetOrientation!\n");
   PDL_SetOrientation("left");
-  PDL_SetOrientation(3);
-  PDL_ScreenTimeoutEnable(5);
-#endif
 }
 
 void turnScreenToPortrait() {

@@ -61,16 +61,16 @@ host_alias =
 host_triplet = arm-none-linux-gnueabi
 CC = gcc
 CXX = g++
-MAKEINFO = /source/tuxrider_port/missing makeinfo
+MAKEINFO = /home/egaudet/webos-internals/tuxracer/missing makeinfo
 PACKAGE = tuxracer
 RANLIB = ranlib
 SDL_CFLAGS = -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 SDL_CONFIG = /usr/local/bin/sdl-config
 SDL_LIBS = -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread
 TR_CFLAGS = -O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
-TR_CPPFLAGS =  -I/usr/local/include -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1
+TR_CPPFLAGS =  -DTUXRACER_NO_ASSERT=1 -I/home/egaudet/webos-internals/tuxracer/tcl8.6a/include -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1
 TR_CXXFLAGS = -O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
-TR_LIBS =  -ldl -lm  -ltcl8.6 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLES_CM -lpdl
+TR_LIBS =  -ldl -lm -L/home/egaudet/webos-internals/tuxracer/tcl8.6a/lib -ltcl8.6 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLES_CM -lpdl
 VERSION = 0.61
 
 bin_PROGRAMS = tuxracer
@@ -84,9 +84,9 @@ PROGRAMS =  $(bin_PROGRAMS)
 
 
 DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I..
-CPPFLAGS =    -I/usr/local/include -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1  -I/usr/local/include -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1
+CPPFLAGS =    -DTUXRACER_NO_ASSERT=1 -I/home/egaudet/webos-internals/tuxracer/tcl8.6a/include -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1  -DTUXRACER_NO_ASSERT=1 -I/home/egaudet/webos-internals/tuxracer/tcl8.6a/include -DTCL_HEADER=\<tcl.h\> -DHAVE_SDL=1 -DHAVE_SDL_MIXER=1
 LDFLAGS = -Wl,-rpath-link,/usr/local/lib -L/usr/local/lib
-LIBS =   -ldl -lm  -ltcl8.6 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLES_CM -lpdl
+LIBS =   -ldl -lm -L/home/egaudet/webos-internals/tuxracer/tcl8.6a/lib -ltcl8.6 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lSDL_mixer  -lGLES_CM -lpdl
 X_CFLAGS = 
 X_LIBS = 
 X_EXTRA_LIBS = 
@@ -99,11 +99,12 @@ gl_util.o hash.o hier.o hier_cb.o hier_util.o hud.o image.o intro.o \
 joystick.o keyboard.o keyboard_util.o keyframe.o lights.o list.o \
 listbox.o loading.o loop.o main.o mirror_course.o multiplayer.o nmrcl.o \
 os_util.o part_sys.o paused.o phys_sim.o pic.o preview.o quadgeom.o \
-quadtree.o race_select.o racing.o racing_mode_select.o render_util.o reset.o save.o \
+quadtree.o race_select.o racing.o render_util.o reset.o save.o \
 screenshot.o splash_screen.o ssbutton.o string_util.o tcl_util.o \
 tex_font_metrics.o textarea.o textures.o track_marks.o tux.o \
 tux_shadow.o ui_mgr.o ui_snow.o ui_theme.o view.o viewfrustum.o \
-winsys.o bonus.o hud_training.o iphonegl.o iphoneglu.o webos.o
+winsys.o bonus.o racing_mode_select.o hud_training.o iphonegl.o iphoneglu.o \
+webos.o
 tuxracer_LDADD = $(LDADD)
 tuxracer_DEPENDENCIES = 
 tuxracer_LDFLAGS = 

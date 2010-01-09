@@ -101,7 +101,6 @@ void choose_sponsor() {
 
 void loading_init(void) 
 {
-  printf("*****HERE\n");
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
@@ -118,7 +117,6 @@ void loading_init(void)
     reshape( getparam_x_resolution(), getparam_y_resolution() );
     
     stop_music();
-    printf("stopped\n");
 }
 
 static pthread_t loading_thread = 0;

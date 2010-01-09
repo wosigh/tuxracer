@@ -81,7 +81,6 @@
 #   define HAVE_SDL 1
 #   define HAVE_SDL_MIXER 1
 #   define HAVE_SDL_JOYSTICKOPEN 1
-#   define VERSION "0.61pre"
 #   define TCL_HEADER <tcl.h>
 #endif
 
@@ -228,6 +227,7 @@ tmp |= ((x) >> 8)  & 0x00ff; \
 #endif
 
 #ifndef TR_DEBUG_MODE
+# undef  TUXRACER_NO_ASSERT
 # define TUXRACER_NO_ASSERT
 #endif
 
