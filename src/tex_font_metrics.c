@@ -65,7 +65,7 @@ if ( fread( (addr), (bytes), 1, (file) ) != 1 ) { \
 }
 
 
-tex_font_metrics_t* load_tex_font_metrics( char *filename )
+tex_font_metrics_t* load_tex_font_metrics( const char *filename )
 {
     tex_font_metrics_t *tfm = NULL;
     FILE *tfm_file = NULL;
@@ -248,7 +248,7 @@ static tfm_char_data_t* find_char_data( tex_font_metrics_t *tfm, char c )
 }
 
 void get_tex_font_string_bbox( tex_font_metrics_t *tfm, 
-			       char *string, 
+			       const char *string, 
 			       int *width, int *max_ascent, int *max_descent )
 {
     int i;
@@ -267,35 +267,56 @@ void get_tex_font_string_bbox( tex_font_metrics_t *tfm,
     *max_descent = tfm->max_descent;
 }
 
+#ifdef __APPLE__
+    #undef glEnableClientState    
+    #undef glVertexPointer    
+    #undef glTexCoordPointer    
+    #undef glDrawArrays    
+
+void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string )
+{
+    int i;
+    int len;
+
+    len = strlen( string );
+
+    GLfloat vertices [len * 4 * 2];
+    GLfloat texCoords [len * 4 * 2];
+    GLfloat xoffset = 0;
+    for (i=0; i<len; i++) {
+        tfm_char_data_t *cd;
+
+        cd = find_char_data(tfm, string[i] );
+        
+        int base = i * 4 * 2;
+        vertices [base++] = (GLfloat) cd->ll.x + xoffset; vertices [base++] = (GLfloat) cd->ll.y;
+        vertices [base++] = (GLfloat) cd->lr.x + xoffset; vertices [base++] = (GLfloat) cd->lr.y;
+        vertices [base++] = (GLfloat) cd->ur.x + xoffset; vertices [base++] = (GLfloat) cd->ur.y;
+        vertices [base++] = (GLfloat) cd->ul.x + xoffset; vertices [base++] = (GLfloat) cd->ul.y;
+
+        base = i * 4 * 2;
+        texCoords [base++] = (GLfloat) cd->tex_ll.x; texCoords [base++] = (GLfloat) cd->tex_ll.y;
+        texCoords [base++] = (GLfloat) cd->tex_lr.x; texCoords [base++] = (GLfloat) cd->tex_lr.y;
+        texCoords [base++] = (GLfloat) cd->tex_ur.x; texCoords [base++] = (GLfloat) cd->tex_ur.y;
+        texCoords [base++] = (GLfloat) cd->tex_ul.x; texCoords [base++] = (GLfloat) cd->tex_ul.y;
+        xoffset += cd->kern_width;
+    }
+    glEnableClientState (GL_VERTEX_ARRAY);
+    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer (2, GL_FLOAT , 0, vertices);	
+    glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+    for (i=0; i<len; i++) 
+        glDrawArrays(GL_TRIANGLE_FAN, i*4, 4);
+}
+
+#else
+
 void draw_tex_font_char( tex_font_metrics_t *tfm, char c )
 {
     tfm_char_data_t *cd;
 
     cd = find_char_data( tfm, c );
-
-#ifdef WEBOS
-      {
-  const GLfloat texCoords[8] = {
-	    cd->tex_ll.x, cd->tex_ll.y,
-	    cd->tex_lr.x, cd->tex_lr.y,
-	    cd->tex_ur.x, cd->tex_ur.y,
-	    cd->tex_ul.x, cd->tex_ul.y,
-  };
-
-  const GLfloat vertexCoords[8] = {
-	    cd->ll.x, cd->ll.y,
-	    cd->lr.x, cd->lr.y,
-	    cd->ur.x, cd->ur.y,
-	    cd->ul.x, cd->ul.y,
-  };
-
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
-  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-  glDrawArrays(GL_TRIANGLES, 0, 4);
-  }
-#else
+    
     glBegin( GL_QUADS );
     {
 	glTexCoord2dv( (scalar_t*) &cd->tex_ll );
@@ -308,12 +329,12 @@ void draw_tex_font_char( tex_font_metrics_t *tfm, char c )
 	glVertex2dv(   (scalar_t*) &cd->ul     );
     }
     glEnd();
-#endif
-
+    
     glTranslatef( cd->kern_width, 0., 0. );
 }
 
-void draw_tex_font_string( tex_font_metrics_t *tfm, char *string )
+
+void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string )
 {
     int i;
     int len;
@@ -324,6 +345,8 @@ void draw_tex_font_string( tex_font_metrics_t *tfm, char *string )
 	draw_tex_font_char( tfm, string[i] );
     }
 }
+
+#endif
 
 bool_t is_character_in_tex_font( tex_font_metrics_t *tfm, char c ) 
 {

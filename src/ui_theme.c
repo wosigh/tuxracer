@@ -21,37 +21,22 @@
 #include "ui_theme.h"
 #include "textures.h"
 
-colour_t ui_background_colour = { 0.48, 0.63, 0.90, 1.0 };
+//colour_t ui_background_colour = { 0.48, 0.63, 0.90, 0. }; tux blue
+colour_t ui_background_colour = { 0.0, 0.0, 0.0, 0. }; //black
 colour_t ui_foreground_colour = { 1.0, 1.0, 1.0, 1.0 }; 
 colour_t ui_highlight_colour = { 1.0, 0.89, 0.01, 1.0 };
 colour_t ui_disabled_colour = { 1.0, 1.0, 1.0, 0.6 };
+#ifdef __APPLE__
+colour_t ui_enabled_but_disabled_colour = { 1.0, 1.0, 1.0, 1.0 };
+#endif
 
 static void draw_quad(int x, int y, int w, int h)
 {
     glPushMatrix();
     {
 	glTranslatef( x, y, 0 );
-#ifdef WEBOS
-  GLfloat t[8] = {
-	    0, 0,
-	    1, 0,
-	    1, 1,
-	    0, 1,
-  };
-
-  GLfloat v[8] = {
-	    0, 0,
-	    w, 0,
-	    w, h,
-	    0, h,
-  };
-
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glVertexPointer(2, GL_FLOAT, 0, v);
-  glTexCoordPointer(2, GL_FLOAT, 0, t);
-  glDrawArrays(GL_TRIANGLES, 0, 4);
-#else
+	
+			
 	glBegin( GL_QUADS );
 	{
 	    glTexCoord2f( 0, 0 );
@@ -67,7 +52,7 @@ static void draw_quad(int x, int y, int w, int h)
 	    glVertex2f( 0, h );
 	}
 	glEnd();
-#endif
+
     }
     glPopMatrix();
 }
@@ -87,43 +72,38 @@ void ui_draw_menu_decorations()
     glColor4f( 1., 1., 1., 1. );
 
     /* bottom left */
-    if ( !get_texture_binding( bl, &texobj ) ) {
-	texobj = 0;
+    if ( get_texture_binding( bl, &texobj ) ) {
+        glBindTexture( GL_TEXTURE_2D, texobj );
+        draw_quad( 0, 0, 256, 256 );
     }
 
-    glBindTexture( GL_TEXTURE_2D, texobj );
-    draw_quad( 0, 0, 256, 256 );
 
     /* bottom right */
-    if ( !get_texture_binding( br, &texobj ) ) {
-	texobj = 0;
+    if ( get_texture_binding( br, &texobj ) ) {
+        glBindTexture( GL_TEXTURE_2D, texobj );
+        draw_quad( w-256, 0, 256, 256 );
     }
 
-    glBindTexture( GL_TEXTURE_2D, texobj );
-    draw_quad( w-256, 0, 256, 256 );
 
     /* top left */
-    if ( !get_texture_binding( tl, &texobj ) ) {
-	texobj = 0;
+    if ( get_texture_binding( tl, &texobj ) ) {
+        glBindTexture( GL_TEXTURE_2D, texobj );
+        draw_quad( 0, h-256, 256, 256 );
     }
 
-    glBindTexture( GL_TEXTURE_2D, texobj );
-    draw_quad( 0, h-256, 256, 256 );
 
     /* top right */
-    if ( !get_texture_binding( tr, &texobj ) ) {
-	texobj = 0;
+    if ( get_texture_binding( tr, &texobj ) ) {
+        glBindTexture( GL_TEXTURE_2D, texobj );
+        draw_quad( w-256, h-256, 256, 256 );
     }
 
-    glBindTexture( GL_TEXTURE_2D, texobj );
-    draw_quad( w-256, h-256, 256, 256 );
 
     /* title */
-    if ( !get_texture_binding( title, &texobj ) ) {
-	texobj = 0;
+    if ( get_texture_binding( title, &texobj ) ) {
+        glBindTexture( GL_TEXTURE_2D, texobj );
+        draw_quad(0-192,h-125, 512, 256 );
     }
 
-    glBindTexture( GL_TEXTURE_2D, texobj );
-    draw_quad( w/2-128, h-128, 256, 128 );
 }
 /* EOF */

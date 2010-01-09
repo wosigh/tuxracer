@@ -47,6 +47,7 @@ void setup_fog()
     enabled = True;
 
     glFogi( GL_FOG_MODE, fog_settings.mode );
+
     glFogf( GL_FOG_DENSITY, fog_settings.density );
     glFogf( GL_FOG_START, fog_settings.start );
     glFogf( GL_FOG_END, fog_settings.end );
@@ -77,7 +78,7 @@ GLfloat* get_fog_colour()
 
 
 static int fog_cb (ClientData cd, Tcl_Interp *ip, 
-		   int argc, char *argv[]) 
+		   int argc, const char *argv[]) 
 {
     scalar_t tmp_arr[4];
     double tmp_dbl;

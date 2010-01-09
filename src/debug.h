@@ -26,6 +26,7 @@ extern "C"
 
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
+#include "TRDebug.h"
 
 typedef enum {
     DEBUG_ODE,
@@ -47,11 +48,7 @@ typedef enum {
 void init_debug();
 bool_t debug_mode_is_active( debug_mode_t mode );
 void debug_mode_set_active( debug_mode_t mode, bool_t active );
-#if 0
 void print_debug( debug_mode_t mode, char *fmt, ... );
-#else
-#define print_debug
-#endif
 void setup_diagnostic_log();
 
 /* Define assertion macros (these do nothing if TUXRACER_NO_ASSERT

@@ -72,15 +72,17 @@
 #  define CONFIG_FILE "options.txt"
 #else
 #  define CONFIG_DIR ".tuxracer"
-#  define CONFIG_FILE "options"
+#  define CONFIG_FILE "tuxracerConfig"
 #endif /* defined( WIN32 ) */
 
 #ifndef DATA_DIR
 #  if defined( WIN32 )
 #    define DATA_DIR "."
-#  else
-#    define DATA_DIR "/usr/local/share/tuxracer"
 #  endif /* defined( WIN32 ) */
+#endif
+
+#ifdef __APPLE__
+#import "sharedGeneralFunctions.h"
 #endif
 
 /* Identifies the parameter type */
@@ -142,7 +144,7 @@ struct param {
 
 void fetch_param_string( struct param *p )
 {
-    char *val;
+    const char *val;
 
     check_assertion( p->type == PARAM_STRING, 
 		     "configuration parameter type mismatch" );
@@ -157,9 +159,9 @@ void fetch_param_string( struct param *p )
 
 }
 
-void set_param_string( struct param *p, char *new_val )
+void set_param_string( struct param *p, const char *new_val )
 {
-    char *ret;
+    const char *ret;
 
     check_assertion( p->type == PARAM_STRING, 
 		     "configuration parameter type mismatch" );
@@ -179,7 +181,7 @@ void set_param_string( struct param *p, char *new_val )
 
 void fetch_param_char( struct param *p )
 {
-    char *str_val;
+    const char *str_val;
 
     check_assertion( p->type == PARAM_CHAR, 
 		     "configuration parameter type mismatch" );
@@ -197,7 +199,7 @@ void fetch_param_char( struct param *p )
 void set_param_char( struct param *p, char new_val )
 {
     char buff[2];
-    char *ret;
+    const char *ret;
 
     check_assertion( p->type == PARAM_CHAR, 
 		     "configuration parameter type mismatch" );
@@ -217,7 +219,7 @@ void set_param_char( struct param *p, char new_val )
 
 void fetch_param_int( struct param *p )
 {
-    char *str_val;
+    const char *str_val;
     int val;
 
     check_assertion( p->type == PARAM_INT, 
@@ -238,7 +240,7 @@ void fetch_param_int( struct param *p )
 void set_param_int( struct param *p, int new_val )
 {
     char buff[30];
-    char *ret;
+    const char *ret;
 
     check_assertion( p->type == PARAM_INT, 
 		     "configuration parameter type mismatch" );
@@ -257,7 +259,7 @@ void set_param_int( struct param *p, int new_val )
 
 void fetch_param_bool( struct param *p )
 {
-    char *str_val;
+    const char *str_val;
     int val;
     bool_t no_val = False;
 
@@ -288,7 +290,7 @@ void fetch_param_bool( struct param *p )
 void set_param_bool( struct param *p, bool_t new_val )
 {
     char buff[2];
-    char *ret;
+    const char *ret;
 
     check_assertion( p->type == PARAM_BOOL, 
 		     "configuration parameter type mismatch" );
@@ -424,10 +426,16 @@ static struct params Params;
 
 void init_game_configuration()
 {
+#ifdef __APPLE__
     INIT_PARAM_STRING( 
-	data_dir, DATA_DIR, 
+	data_dir, strdup(getRessourcePath()), 
 	"# The location of the Tux Racer data files" );
+# else
+	INIT_PARAM_STRING( 
+					  data_dir,DATA_DIR, 
+					  "# The location of the Tux Racer data files" );
 
+#endif
     INIT_PARAM_BOOL( 
 	draw_tux_shadow, False, 
 	"# Set this to true to display Tux's shadow.  Note that this is a \n"
@@ -437,13 +445,13 @@ void init_game_configuration()
 	"# to enable the use of the stencil buffer" );
 
     INIT_PARAM_BOOL( 
-	draw_particles, True,
+	draw_particles, False,
 	"# Controls the drawing of snow particles that are kicked up as Tux\n"
 	"# turns and brakes.  Setting this to false should help improve \n"
 	"# performance." );
 
     INIT_PARAM_INT( 
-	tux_sphere_divisions, 6,
+	tux_sphere_divisions, 8,
 	"# [EXPERT] Higher values result in a more finely subdivided mesh \n"
 	"# for Tux, and vice versa.  If you're experiencing low framerates,\n"
 	"# try lowering this value." );
@@ -459,7 +467,7 @@ void init_game_configuration()
 	"# performance.");
 
     INIT_PARAM_BOOL( 
-	use_sphere_display_list, True,
+	use_sphere_display_list, False,
 	"# [EXPERT]  Mesa 3.1 sometimes renders Tux strangely when display \n"
 	"# lists are used.  Setting this to false should solve the problem \n"
 	"# at the cost of a few Hz." );
@@ -469,7 +477,7 @@ void init_game_configuration()
 	"# Set this to true to display the current framerate in Hz." );
 
     INIT_PARAM_INT( 
-	x_resolution, 640,
+	x_resolution, 320,
 	"# The horizontal size of the Tux Racer window" );
 
     INIT_PARAM_INT( 
@@ -530,7 +538,7 @@ void init_game_configuration()
 	"# Possible values are:\n"
 	"#\n"
 	"#   0: Modified Euler     (fastest but least accurate)\n"
-        "#   1: Runge-Kutta (2,3)\n"
+    "#   1: Runge-Kutta (2,3)\n"
 	"#   2: Runge-Kutta (4,5)  (slowest but most accurate)" );
 
     INIT_PARAM_STRING( 
@@ -562,12 +570,13 @@ void init_game_configuration()
 	above_view_key, "3" ,
 	"# Key binding for the \"Above\" camera mode" );
     INIT_PARAM_INT( 
-	view_mode, 1 ,
+	view_mode, 1,
 	"# Default view mode. Possible values are\n" 
 	"#\n"
 	"#   0: Behind\n"
 	"#   1: Follow\n"
-	"#   2: Above" );
+	"#   2: Above\n"
+    "#   3: Tux eyes" );
     INIT_PARAM_STRING( 
 	screenshot_key, "=" ,
 	"# Key binding for taking a screenshot" );
@@ -613,7 +622,7 @@ void init_game_configuration()
 	"# Joystick axis to use for paddling/braking (numbering starts at 0)" );
 
     INIT_PARAM_INT( 
-	fov, 60 ,
+	fov, 70 ,
 	"# [EXPERT] Sets the camera field-of-view" );
     INIT_PARAM_STRING( 
 	debug, "" ,
@@ -622,31 +631,31 @@ void init_game_configuration()
 	warning_level, 100 ,
 	"# [EXPERT] Controls the Tux Racer warning messages" );
     INIT_PARAM_INT( 
-	forward_clip_distance, 75 ,
+	forward_clip_distance, 40 ,
 	"# Controls how far ahead of the camera the course\n"
 	"# is rendered.  Larger values mean that more of the course is\n"
 	"# rendered, resulting in slower performance. Decreasing this \n"
 	"# value is an effective way to improve framerates." );
     INIT_PARAM_INT( 
-	backward_clip_distance, 10 ,
+	backward_clip_distance, 5,
 	"# [EXPERT] Some objects aren't yet clipped to the view frustum, \n"
 	"# so this value is used to control how far up the course these \n"
 	"# objects are drawn." );
     INIT_PARAM_INT( 
-	tree_detail_distance, 20 ,
+	tree_detail_distance, 5 ,
 	"# [EXPERT] Controls the distance at which trees are drawn with \n"
 	"# two rectangles instead of one." );
-    INIT_PARAM_BOOL( 
+    INIT_PARAM_BOOL(
 	terrain_blending, True ,
 	"# Controls the blending of the terrain textures.  Setting this\n"
 	"# to false will help improve performance." );
     INIT_PARAM_BOOL( 
-	perfect_terrain_blending, False ,
+	perfect_terrain_blending, False,
 	"# [EXPERT] If true, then terrain triangles with three different\n"
 	"# terrain types at the vertices will be blended correctly\n"
 	"# (instead of using a faster but imperfect approximation)." );
     INIT_PARAM_BOOL( 
-	terrain_envmap, True ,
+	terrain_envmap, False,
 	"# If true, then the ice will be drawn with an \"environment map\",\n"
 	"# which gives the ice a shiny appearance.  Setting this to false\n"
 	"# will help improve performance." );
@@ -667,7 +676,7 @@ void init_game_configuration()
 	"# when using compiled vertex arrays.  This activates a hack \n"
 	"# to work around that problem." );
     INIT_PARAM_INT( 
-	course_detail_level, 75 ,
+	course_detail_level, 10 ,
 	"# [EXPERT] This controls how accurately the course terrain is \n"
 	"# rendered. A high value results in greater accuracy at the cost of \n"
 	"# performance, and vice versa.  This value can be decreased and \n"
@@ -712,14 +721,18 @@ void init_game_configuration()
 	"# Increase the buffer size if you experience choppy audio\n" 
 	"# (at the cost of greater audio latency)" );
     INIT_PARAM_BOOL( 
-	track_marks, True ,
+	track_marks, False ,
 	"# If true, then the players will leave track marks in the snow." );
     INIT_PARAM_BOOL( 
-	ui_snow, True ,
+	ui_snow, False ,
 	"# If true, then the ui screens will have falling snow." );
 
     INIT_PARAM_BOOL( 
-	write_diagnostic_log, False ,
+#ifdef TR_DEBUG_MODE
+	write_diagnostic_log, True,
+#else
+	write_diagnostic_log, False,
+#endif
 	"# If true, then a file called diagnostic_log.txt will be generated\n" 
 	"# which you should attach to any bug reports you make.\n"
 	"# To generate the file, set this variable to \"true\", and\n"
@@ -837,6 +850,16 @@ int get_config_dir_name( char *buff, int len )
     }
     strcpy( buff, CONFIG_DIR );
     return 0;
+#elif defined(__APPLE__)
+    const char * configDir = getConfigPath();
+    assert(configDir);
+
+    if ( strlen( configDir ) + 1 > len ) {
+    assert(0);
+	return 1;
+    }
+    strcpy( buff, configDir );
+    return 0;
 #else
     struct passwd *pwent;
 
@@ -937,6 +960,11 @@ void write_config_file()
     struct param *parm;
     int i;
 
+#ifdef  __APPLE__
+    // Don't save the config file on iphone, no use for it.
+    return;
+#endif
+
     if ( get_config_file_name( config_file, sizeof( config_file ) ) != 0 ) {
 	return;
     }
@@ -974,6 +1002,14 @@ void write_config_file()
 
     for (i=0; i<sizeof(Params)/sizeof(struct param); i++) {
 	parm = (struct param*)&Params + i;
+	
+	//FIXME : dans la version simulateur, on ne veut as qu'il enregistre le data_dir car il change à chaque fois et sinon c'est la merde
+	if (!strcmp(parm->name,"data_dir")) continue;
+
+    // Don't save the resolution
+	if (!strcmp(parm->name,"x_resolution")) continue;
+	if (!strcmp(parm->name,"y_resolution")) continue;
+	
 	if ( parm->comment != NULL ) {
 	    fprintf( config_stream, "\n# %s\n#\n%s\n#\n", 
 		     parm->name, parm->comment );
@@ -1013,7 +1049,7 @@ void write_config_file()
  * Tcl callback to allow reading of game configuration variables from Tcl.
  */
 static int get_param_cb ( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
     int i;
     int num_params;
@@ -1077,7 +1113,7 @@ static int get_param_cb ( ClientData cd, Tcl_Interp *ip,
  * Tcl callback to allow setting of game configuration variables from Tcl.
  */
 static int set_param_cb ( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
     int i;
     int tmp_int;

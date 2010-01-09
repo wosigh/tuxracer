@@ -37,7 +37,10 @@ extern "C"
 #define COURSE_VERTEX(x,y) make_point( (scalar_t)(x)/(nx-1.)*course_width, \
                        ELEV((x),(y)), -(scalar_t)(y)/(ny-1.)*course_length ) 
 
+void preload_course( char *course );
 void load_course( char *course );
+void load_course_core( char *course );
+void postload_course( char *course );
 
 scalar_t     *get_course_elev_data();
 terrain_t    *get_course_terrain_data();
@@ -60,6 +63,8 @@ void          set_course_mirroring( bool_t state );
 bool_t        get_course_mirroring( );
 void          fill_gl_arrays();
 void          get_gl_arrays( GLubyte **vertex_normal_arr );
+
+char		 *get_calculation_mode();
 
 void          register_course_load_tcl_callbacks( Tcl_Interp *interp );
 

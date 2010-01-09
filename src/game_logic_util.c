@@ -23,6 +23,13 @@
 #include "list.h"
 #include "course_mgr.h"
 #include "save.h"
+#include "course_load.h"
+#include "loop.h"
+#include "racing.h"
+
+#ifdef __APPLE__
+static scalar_t flying_time;
+#endif
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -58,6 +65,7 @@ bool_t was_current_race_won()
 	print_debug( DEBUG_GAME_LOGIC, "lost race" );
 	return False;
     }
+	return False;
 }
 
 
@@ -121,25 +129,25 @@ bool_t did_player_beat_best_results( void )
     scalar_t time;
     int herring;
     int score;
-
+    
     if ( !get_saved_race_results( plyr->name,
-				  g_game.current_event,
-				  g_game.current_cup,
-				  g_game.race.name,
-				  g_game.difficulty,
-				  &time,
-				  &herring,
-				  &score ) )
+                                 g_game.current_event,
+                                 g_game.current_cup,
+                                 g_game.race.name,
+                                 g_game.difficulty,
+                                 &time,
+                                 &herring,
+                                 &score ) )
     {
-	/* No previous result, so we didn't "beat" anything */
-	return False;
+        /* No previous result, so we didn't "beat" anything : OK BUT WE STILL WANT TO SAVE THE SCORE ONLINE !!!!! */
+        return True;
     }
-
-    if ( plyr->score > score ) {
-	return True;
-    } else {
-	return False;
-    }
+    
+    if ( g_game.is_speed_only_mode && plyr->score < score ) {
+        return True;
+    } else if (!g_game.is_speed_only_mode && plyr->score > score) {
+        return True;
+    } else return False;
 }
 
 
@@ -175,8 +183,80 @@ bool_t is_current_cup_complete( void )
     return is_cup_complete( event_data, elem );
 }
 
-
-
+#ifdef __APPLE__
+int calculate_player_score(player_data_t *plyr) {
+    int score;
+    scalar_t par_time;
+    int herring_count = plyr->herring;
+    
+    /* use easy time as par score */
+    par_time = g_game.race.time_req[DIFFICULTY_LEVEL_EASY];
+    
+    scalar_t flying_bonus;
+    scalar_t tricks_bonus;
+    scalar_t herring_bonus;
+    scalar_t time_bonus;
+    
+    /* Bonus calculation, depending of the calulation mode */
+    //Takes account of the optional tcl info tux_calculation_mode in course.tcl
+    
+    //Jump mode
+    if (strcmp(get_calculation_mode(),"jump")==0) 
+        //takes account of the flying time
+    {
+        //Quand tux ne vole pas,on fixe flying_time à plyr->control.fly_total_time (surtout utile au début de la course, car c'est une variable statique, ainsi ca la remet à zéro)
+        if (!plyr->control.is_flying)
+        {
+            flying_time = plyr->control.fly_total_time;
+        }
+        else {
+            if (g_game.time-plyr->control.fly_start_time > FLYING_TIME_LIMIT) {
+                flying_time = plyr->control.fly_total_time + g_game.time-plyr->control.fly_start_time;
+            }
+        }
+        flying_bonus = 1227*flying_time;
+        tricks_bonus = plyr->bonus_tricks;
+        herring_bonus = 200*herring_count;
+        time_bonus = 0;
+    } 
+    //Half_Pipe mode
+    else if (strcmp(get_calculation_mode(),"Half_Pipe")==0) 
+        //takes account of tricks made
+    {
+        flying_bonus = 0;
+        tricks_bonus = plyr->bonus_tricks;
+        herring_bonus = 0;
+        time_bonus = 0;
+        //If remainig time become 0, game is aborted specifying that time was over
+        if ((par_time-g_game.time) < 0)
+        {
+            g_game.race_aborted = True;
+            g_game.race_time_over = True;
+            set_game_mode(GAME_OVER);
+        }
+    }
+    //default mode SpeedOnly
+    else if (g_game.is_speed_only_mode) {
+        flying_bonus = 0;
+        tricks_bonus = 0;
+        herring_bonus = 0;
+        time_bonus = 100*(g_game.time);
+    }
+	//default mode Classic
+	else {
+        flying_bonus = 0;
+        tricks_bonus = 0;
+        herring_bonus = 200*herring_count;
+        time_bonus = 100*(par_time-g_game.time);
+    }
+    
+    
+    /* score calculation */
+    score = max( 0, (int) (time_bonus + herring_bonus + flying_bonus + tricks_bonus) );
+    
+    return score;
+}
+#endif
 /*---------------------------------------------------------------------------*/
 /*! 
   Updates a player's score; to be called after a race is complete
@@ -186,14 +266,10 @@ bool_t is_current_cup_complete( void )
 */
 void update_player_score( player_data_t *plyr )
 {
-    scalar_t par_time;
-
-    /* use easy time as par score */
-    par_time = g_game.race.time_req[DIFFICULTY_LEVEL_EASY];
-    plyr->score = max( 0, (int) (
-	100*(par_time-g_game.time) + 200*plyr->herring ) );
+    int score;
+    score = calculate_player_score(plyr);
+    plyr->score=score;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 

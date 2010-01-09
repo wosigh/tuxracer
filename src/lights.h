@@ -34,6 +34,7 @@ light_t* get_course_lights();
 void reset_lights();
 
 void setup_course_lighting();
+void setup_course_lighting_for_tux(bool forTux);
 
 void register_course_light_callbacks( Tcl_Interp *ip );
 

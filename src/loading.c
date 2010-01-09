@@ -41,46 +41,62 @@
 #include "ui_theme.h"
 #include "joystick.h"
 #include "part_sys.h"
+#include "textures.h"
+#import <pthread.h>
 
 #define NEXT_MODE RACING
 
-static char *loaded_course = NULL;
+//#define ASYNC_LOADING
+static char* loaded_course = NULL;
+
+static char* sponsor_selected;
+
+//En fait, la fonction loading_loop n'est pas une vrai fonction Loop, elle n'est executée qu'une fois, et comme ce n'est qu'une fois qu'on en sort que
+//L'écran est redessiné, il faut la faire tourner au moins une fois sans rien loader pour que l'écran loading aparaisse, sinon il apparait quand tout est déjà chargé.
+static int passInLoop;
 static race_conditions_t loaded_conditions = (race_conditions_t)-1;
 
 /*---------------------------------------------------------------------------*/
 /*! 
-  Draws the text for the loading screen
-  \author  jfpatry
-*/
+ Draws the text for the loading screen
+ \author  jfpatry
+ */
 void draw_loading_text( void )
 {
     int w = getparam_x_resolution();
     int h = getparam_y_resolution();
     int x_org, y_org;
-    char *string;
+    const char *string;
     int string_w, asc, desc;
     font_t *font;
-
+    
     x_org = w/2.0;
     y_org = h/2.0;
-
+    
     if ( !get_font_binding( "loading", &font ) ) {
-	print_warning( IMPORTANT_WARNING,
-		       "Couldn't get font for binding loading" );
+        print_warning( IMPORTANT_WARNING,
+                      "Couldn't get font for binding loading" );
     } else {
-	string = "Loading, Please Wait...";
-	get_font_metrics( font, string, &string_w, &asc, &desc );
-	
-	glPushMatrix();
-	{
-	    glTranslatef( w/2.0 - string_w/2.0,
-			  h/2.0 - desc, 
-			  0 );
-	    bind_font_texture( font );
-	    draw_string( font, string );
-	}
-	glPopMatrix();
+        string = Localize("Loading, Please Wait...","");
+        get_font_metrics( font, string, &string_w, &asc, &desc );
+        
+        glPushMatrix();
+        {
+            glTranslatef( w/2.0 - string_w/2.0,
+                         h/2.0 - desc-30, 
+                         0 );
+            bind_font_texture( font );
+            draw_string( font, string );
+        }
+        glPopMatrix();
     }
+}
+
+void choose_sponsor() {
+	int n = rand() % 5;
+	if (n==0||n==1) sponsor_selected = "loading_zag";
+	if (n==2||n==3) sponsor_selected = "loading_furlan";
+	if (n==4) sponsor_selected = "loading_julbo";
 }
 
 void loading_init(void) 
@@ -88,11 +104,89 @@ void loading_init(void)
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( NULL );
-    winsys_set_motion_func( NULL );
+    winsys_set_mouse_func( ui_event_mouse_func );
+    winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( NULL );
+    
+    passInLoop = 0;
+    
+    draw_loading_text();
+	
+	choose_sponsor();
+    
+    reshape( getparam_x_resolution(), getparam_y_resolution() );
+    
+    stop_music();
+}
 
-    play_music( "loading" );
+static pthread_t loading_thread = 0;
+static pthread_mutex_t load_mutex = PTHREAD_MUTEX_INITIALIZER;
+static bool loading_done = false;
+
+void * load_course_thread(void * unused)
+{
+#ifdef TR_DEBUG_MODE
+    uint64_t load_start = udate();
+#endif
+    /* Load the course */
+    load_course_core( g_game.race.course );
+    
+    pthread_mutex_lock(&load_mutex);
+    loading_done = true;
+    pthread_mutex_unlock(&load_mutex);
+
+#ifdef TR_DEBUG_MODE
+    TRDebugLog("(loading thread) Loading took %dms\n", (int32_t)(((int64_t)udate() - (int64_t)load_start) / 1000000));
+#endif
+
+    return NULL;
+}
+
+#ifdef TR_DEBUG_MODE
+uint64_t abs_load_start = 0;
+#endif
+
+void draw_quad(int x, int y, int w, int h)
+{
+    glPushMatrix();
+    {
+		glTranslatef( x, y, 0 );
+		
+		glBegin( GL_QUADS );
+		{
+			glTexCoord2f( 0, 0 );
+			glVertex2f( 0, 0 );
+			
+			glTexCoord2f( 1, 0 );
+			glVertex2f( w, 0 );
+			
+			glTexCoord2f( 1, 1 );
+			glVertex2f( w, h );
+			
+			glTexCoord2f( 0, 1 );
+			glVertex2f( 0, h );
+		}
+		glEnd();
+		
+    }
+    glPopMatrix();
+}
+
+void draw_sponsor_loading()
+{
+    GLuint texobj;
+	
+    int w = getparam_x_resolution();
+    int h = getparam_y_resolution();
+	
+    glEnable( GL_TEXTURE_2D );
+    
+    /* loading */
+    if ( get_texture_binding( sponsor_selected, &texobj ) ) {
+        glBindTexture( GL_TEXTURE_2D, texobj );
+        draw_quad(0,0, w, h );
+    }
+	
 }
 
 void loading_loop( scalar_t time_step )
@@ -102,43 +196,88 @@ void loading_loop( scalar_t time_step )
     height = getparam_y_resolution();
 
     check_gl_error();
-
+    
     update_audio();
-
+    
     clear_rendering_context();
-
+    
     set_gl_options( GUI );
-
+    
     ui_setup_display();
-
-    if (getparam_ui_snow()) {
-	update_ui_snow( time_step, g_game.race.windy );
-	draw_ui_snow();
-    }
-
-    ui_draw_menu_decorations();
-
-    draw_loading_text();
-
+    
+	//disabled for sponsors
+    /*if (getparam_ui_snow()) {
+        update_ui_snow( time_step, g_game.race.windy );
+        draw_ui_snow();
+    }*/
+    
+    draw_sponsor_loading();
+    
+	//disabled for sponsors
+    //draw_loading_text();
+    
     reshape( width, height );
-
+    
     winsys_swap_buffers();
 
-    if ( loaded_course == NULL ||
-	 loaded_course != g_game.race.course ||
-	 loaded_conditions != g_game.race.conditions ) 
-    {
-	/* Load the course */
-	load_course( g_game.race.course );
+#ifndef ASYNC_LOADING
+    if(passInLoop++ < 2) return;
+#endif
 
-	loaded_course = g_game.race.course;
-	loaded_conditions = g_game.race.conditions;
+    if ( loaded_course == NULL ||
+        loaded_course != g_game.race.course ||
+        loaded_conditions != g_game.race.conditions ) 
+    {
+        if(!loading_thread) {
+            loading_done = false;
+#ifdef TR_DEBUG_MODE
+            abs_load_start = udate();
+#endif
+            preload_course(g_game.race.course);
+            winsys_set_high_framerate(false);
+#ifdef ASYNC_LOADING
+            pthread_create(&loading_thread, NULL, load_course_thread, NULL);
+#else
+            load_course_thread(NULL);
+#endif
+        }
+        pthread_mutex_lock(&load_mutex);
+        bool done = loading_done;
+        pthread_mutex_unlock(&load_mutex);
+        if(done) {
+#ifdef ASYNC_LOADING
+            pthread_join(loading_thread, NULL);
+#endif
+            loading_thread = 0;
+
+#ifdef TR_DEBUG_MODE
+            TRDebugLog("(main thread) loading thread took %dms\n", (int32_t)(((int64_t)udate() - (int64_t)abs_load_start) / 1000000));
+#endif
+
+            postload_course(g_game.race.course);
+
+            loaded_course = g_game.race.course;
+            loaded_conditions = g_game.race.conditions;
+            
+            set_course_mirroring( g_game.race.mirrored );
+    
+            winsys_set_high_framerate(true);
+
+            /* We're done here, enter INTRO mode */
+            set_game_mode(INTRO);
+#ifdef TR_DEBUG_MODE
+            TRDebugLog("Total loading took %dms\n", (int32_t)(((int64_t)udate() - (int64_t)abs_load_start) / 1000000));
+#endif
+
+        }
+    } else {
+        winsys_set_high_framerate(true);
+
+        set_course_mirroring( g_game.race.mirrored );
+
+        set_game_mode(INTRO);
     }
 
-    set_course_mirroring( g_game.race.mirrored );
-
-    /* We're done here, enter INTRO mode */
-    set_game_mode( INTRO );
 } 
 
 void loading_register()

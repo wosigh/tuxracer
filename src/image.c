@@ -48,13 +48,12 @@
      } Image;
 
 
-static Image *ImageOpen(char *fileName)
+static Image *ImageOpen(const char *fileName)
 {
   Image *image;
   unsigned int *rowStart, *rowSize, ulTmp;
   int x, i;
-
-  image = (Image *)malloc(sizeof(Image));
+  image = (Image *)calloc(1, sizeof(Image));
   if (image == NULL) 
     {
       fprintf(stderr, "Out of memory!\n");
@@ -127,6 +126,8 @@ static void ImageClose( Image *image)
   int i;
 
   fclose(image->file);
+  free(image->rowSize);
+  free(image->rowStart);
   for ( i = 0 ; i <= image->sizeZ ; i++ )
     free(image->tmp[i]);
   free(image);
@@ -210,7 +211,7 @@ static void ImageGetRawData( Image *image, unsigned char *data)
     }
 }
 
-IMAGE *ImageLoad(char *fileName)
+IMAGE *ImageLoad(const char *fileName)
 {
   Image *image;
   IMAGE *final;

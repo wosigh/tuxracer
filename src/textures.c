@@ -29,7 +29,7 @@ static hash_table_t texture_table;
 static hash_table_t binding_table;
 
 
-bool_t get_texture_binding( char *binding, GLuint *texid )
+bool_t get_texture_binding( const char *binding, GLuint *texid )
 {
     texture_node_t *texnode;
     if (get_hash_entry(binding_table, binding, (hash_entry_t*)(&texnode))) {
@@ -39,7 +39,7 @@ bool_t get_texture_binding( char *binding, GLuint *texid )
     return False;  
 }
 
-bool_t load_and_bind_texture( char *binding, char *filename )
+bool_t load_and_bind_texture( const char *binding, const char *filename )
 {
     return (bool_t) ( load_texture( binding, filename, 1 ) &&
 		      bind_texture( binding, binding ) );
@@ -74,53 +74,31 @@ int get_min_filter()
     }
 }
 
-bool_t load_texture( char *texname, char *filename, int repeatable )
+void delete_texture_main_thread( void * texture_id )
 {
-    IMAGE *texImage;
-    texture_node_t *tex;
+    glDeleteTextures( 1, texture_id );
+}
+
+void load_texture_main_thread( void * texArg, void *texImageArg )
+{
+    IMAGE *texImage = texImageArg;
+    texture_node_t *tex = texArg;
     int max_texture_size;
 
-
-    print_debug(DEBUG_TEXTURE, "Loading texture %s from file: %s", 
-		texname, filename);
-    if ( initialized == False ) {
-        check_assertion( 0, "texture module not initialized" );
-    } 
-
-    texImage = ImageLoad( filename );
-
-    if ( texImage == NULL ) {
-    	print_warning( IMPORTANT_WARNING, 
-		       "couldn't load image %s", filename );
-    	return False;
-    }
-
-    if (get_hash_entry( texture_table, texname, (hash_entry_t*)&tex )) { 
-	print_debug(DEBUG_TEXTURE, "Found texture %s with id: %d", 
-		    texname, tex->texture_id);
-        glDeleteTextures( 1, &(tex->texture_id) );
-    } else {
-        tex = (texture_node_t*)malloc(sizeof(texture_node_t));
-
-	check_assertion( tex != NULL, "out of memory" );
-
-	tex->ref_count = 0;
-	add_hash_entry( texture_table, texname, (hash_entry_t)tex ); 
-    }
- 
-    tex->repeatable = repeatable;
     glGenTextures( 1, &(tex->texture_id) );
     glBindTexture( GL_TEXTURE_2D, tex->texture_id );
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 
-    if ( repeatable ) {
+    if ( tex->repeatable ) {
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
     } else {
+#ifndef __APPLE__DISABLED__
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+#endif
     }
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
@@ -131,9 +109,8 @@ bool_t load_texture( char *texname, char *filename, int repeatable )
     if ( texImage->sizeX > max_texture_size ||
 	 texImage->sizeY > max_texture_size ) 
     {
-#ifdef WEBOS
-      printf("We don't support scaling image yet!?\n");
-      abort();
+#ifdef __APPLE__DISABLED__
+        abort(); //We don't support that yet
 #else
 	char *newdata = (char*)malloc( texImage->sizeZ *
 				       max_texture_size *
@@ -141,9 +118,9 @@ bool_t load_texture( char *texname, char *filename, int repeatable )
 
 	check_assertion( newdata != NULL, "out of memory" );
 
-	print_debug( DEBUG_TEXTURE, "Texture `%s' too large -- scaling to "
-		     "maximum allowed size",
-		     filename );
+	print_debug( DEBUG_TEXTURE, "Texture too large -- scaling to "
+		     "maximum allowed size" );
+
 
 	/* In the case of large- or small-aspect ratio textures, this
            could end up using *more* space... oh well. */
@@ -162,7 +139,11 @@ bool_t load_texture( char *texname, char *filename, int repeatable )
 #endif
     }
 
-#ifdef WEBOS // EJG: From iphone TRWC
+#ifndef __APPLE__
+    gluBuild2DMipmaps( GL_TEXTURE_2D, texImage->sizeZ, texImage->sizeX,
+		       texImage->sizeY, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA, 
+		       GL_UNSIGNED_BYTE, texImage->data );
+#else
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -172,28 +153,62 @@ bool_t load_texture( char *texname, char *filename, int repeatable )
 		       texImage->sizeY == 255 ? 256 : texImage->sizeY /* Work around for tree.png */,
                0, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA,
 		       GL_UNSIGNED_BYTE, texImage->data );
-#else
-    gluBuild2DMipmaps( GL_TEXTURE_2D, texImage->sizeZ, texImage->sizeX,
-		       texImage->sizeY, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA, 
-		       GL_UNSIGNED_BYTE, texImage->data );
 #endif
-
     free( texImage->data );
     free( texImage );
+}
+
+bool_t load_texture( const char *texname, const char *filename, int repeatable )
+{
+    IMAGE *texImage;
+    texture_node_t *tex;
+
+
+    print_debug(DEBUG_TEXTURE, "Loading texture %s from file: %s", 
+		texname, filename);
+    if ( initialized == False ) {
+        check_assertion( 0, "texture module not initialized" );
+    } 
+
+    if (get_hash_entry( texture_table, texname, (hash_entry_t*)&tex )) { 
+        print_debug(DEBUG_TEXTURE, "Found texture %s with id: %d", texname, tex->texture_id);
+        return true; // Don't reload the texture.
+        //winsys_perform_on_main_thread_sync1(delete_texture_main_thread, &(tex->texture_id));
+    } else {
+        tex = (texture_node_t*)malloc(sizeof(texture_node_t));
+
+	check_assertion( tex != NULL, "out of memory" );
+
+    texImage = ImageLoad( filename );
+
+    if ( texImage == NULL ) {
+    	print_warning( IMPORTANT_WARNING, 
+		       "couldn't load image %s", filename );
+    	return False;
+    }
+
+
+	tex->ref_count = 0;
+	add_hash_entry( texture_table, texname, (hash_entry_t)tex ); 
+    }
+ 
+    tex->repeatable = repeatable;
+    
+    winsys_perform_on_main_thread_sync2(load_texture_main_thread, tex, texImage);
 
     return True;
 } 
 
 
 bool_t 
-get_texture( char *texname, texture_node_t **tex )
+get_texture( const char *texname, texture_node_t **tex )
 {
     return get_hash_entry(texture_table, texname, (hash_entry_t*)tex);		
 }
 
 
 bool_t 
-del_texture( char *texname )
+del_texture( const char *texname )
 {
     texture_node_t *tex;
 
@@ -212,7 +227,7 @@ del_texture( char *texname )
 }
 
 
-bool_t bind_texture( char *binding, char *texname )
+bool_t bind_texture( const char *binding, const char *texname )
 {
     texture_node_t *tex, *oldtex;
 
@@ -237,7 +252,7 @@ bool_t bind_texture( char *binding, char *texname )
     return True;
 }
 
-bool_t unbind_texture( char *binding )
+bool_t unbind_texture( const char *binding )
 {
     texture_node_t *tex;
 
@@ -255,9 +270,8 @@ bool_t unbind_texture( char *binding )
 
 void get_current_texture_dimensions( int *width, int *height )
 {
-#ifdef WEBOS
-  printf("I can't get current texture dimensions!\n");
-  abort();
+#ifdef __APPLE__
+    abort();
 #else
     glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, width );
     glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, height );
@@ -300,7 +314,7 @@ bool_t flush_textures(void)
 }
 
 static int load_texture_cb ( ClientData cd, Tcl_Interp *ip, int argc, 
-			     char *argv[]) 
+			     const char *argv[]) 
 {
     int repeatable = 1;
 
@@ -327,7 +341,7 @@ static int load_texture_cb ( ClientData cd, Tcl_Interp *ip, int argc,
 }
 
 static int bind_texture_cb ( ClientData cd, Tcl_Interp *ip, int argc, 
-			     char *argv[])
+			     const char *argv[])
 {
     if ( argc != 3 ) {
 	Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 

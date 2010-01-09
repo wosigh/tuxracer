@@ -317,16 +317,19 @@ void setup_view_matrix( player_data_t *plyr )
     view_mat[3][2] = -viewpt_in_view_frame.z;
     
     glLoadIdentity();
-#ifdef WEBOS
-    GLfloat m[3][3] = {
-      {view_mat[0][0], view_mat[0][1], view_mat[0][2]},
-      {view_mat[1][0], view_mat[1][1], view_mat[1][2]},
-      {view_mat[2][0], view_mat[2][1], view_mat[2][2]},
-    };
-    glMultMatrixf((GLfloat*)m);
+#ifdef __APPLE__DISABLED__
+    GLfloat matrix[3][3];
+    int i,j;
+    for( i = 0; i < 3; i++ )
+    {
+        for( j = 0; j < 3; j++ )
+            matrix[i][j] = view_mat[i][j];
+    }
+    glMultMatrixf( (GLfloat *) matrix );
 #else
     glMultMatrixd( (scalar_t *) view_mat );
 #endif
+
 }
 
 /*! 
@@ -341,6 +344,24 @@ void setup_view_matrix( player_data_t *plyr )
   \date    Created:  2000-08-26
   \date    Modified: 2000-08-26
 */
+
+static inline scalar_t sign(scalar_t a)
+{
+    return a > 0 ? 1. : -1.;
+}
+
+static inline scalar_t absd(scalar_t a)
+{
+    return a > 0 ? a : -a;
+}
+
+static inline scalar_t jump_from_time(scalar_t t)
+{
+    scalar_t s = sign(t);
+    t = absd(t);
+    return s * (1 - exp(-5*t) + t)/(2 - exp(-5));
+}
+
 void update_view( player_data_t *plyr, scalar_t dt )
 {
     point_t view_pt;
@@ -374,7 +395,53 @@ void update_view( player_data_t *plyr, scalar_t dt )
     course_angle = get_course_angle();
 
     switch( plyr->view.mode ) {
+    case TUXEYE:
+    {
+        view_pt = plyr->pos;
+        scalar_t f = 2;
 
+        vector_t v = plyr->plane_nml;
+        scalar_t n = 1.;
+        view_pt.x += v.x / n  * 0.3;
+        view_pt.y += v.y / n * 0.3;
+        view_pt.y += 0.1;
+        view_pt.z += v.z / n * 0.3;
+
+
+        if(plyr->control.flip_factor || plyr->control.barrel_roll_factor) {
+            matrixgl_t mat1, mat;
+            scalar_t n = sqrt(plyr->viewdir_for_tuxeye.x * plyr->viewdir_for_tuxeye.x + plyr->viewdir_for_tuxeye.y * plyr->viewdir_for_tuxeye.y + plyr->viewdir_for_tuxeye.z * plyr->viewdir_for_tuxeye.z);
+            plyr->viewdir_for_tuxeye.x /= n;
+            plyr->viewdir_for_tuxeye.y /= n;
+            plyr->viewdir_for_tuxeye.z /= n;
+            n = sqrt(plyr->updir_for_tuxeye.x * plyr->updir_for_tuxeye.x + plyr->updir_for_tuxeye.y * plyr->updir_for_tuxeye.y + plyr->updir_for_tuxeye.z * plyr->updir_for_tuxeye.z);
+            plyr->updir_for_tuxeye.x /= n;
+            plyr->updir_for_tuxeye.y /= n;
+            plyr->updir_for_tuxeye.z /= n;
+            vector_t right = cross_product(plyr->updir_for_tuxeye, plyr->viewdir_for_tuxeye);
+            make_rotation_about_vector_matrix( mat1, right, jump_from_time(plyr->control.flip_factor) * 360 );
+            make_rotation_about_vector_matrix( mat, plyr->viewdir_for_tuxeye, jump_from_time(plyr->control.barrel_roll_factor)  * 360 );
+            multiply_matrices(mat, mat1, mat);
+            view_dir = transform_vector(mat, plyr->viewdir_for_tuxeye);
+            up_dir = transform_vector(mat, plyr->updir_for_tuxeye);
+        }
+        else {
+            view_dir = plyr->direction;
+            view_dir.y += 0.1;
+
+            view_dir.x = (plyr->view.dir.x * f +  view_dir.x) / (f + 1);
+            view_dir.y = (plyr->view.dir.y * f + view_dir.y) / (f + 1);
+            view_dir.z = (plyr->view.dir.z * f + view_dir.z) / (f + 1);
+            plyr->viewdir_for_tuxeye = view_dir;
+
+            up_dir = plyr->plane_nml;
+            up_dir.x = (plyr->view.up.x * f +  up_dir.x) / (f + 1);
+            up_dir.y = (plyr->view.up.y * f + up_dir.y) / (f + 1);
+            up_dir.z = (plyr->view.up.z * f + up_dir.z) / (f + 1);
+            plyr->updir_for_tuxeye = up_dir;
+        }
+        break;
+    }
     case BEHIND:
     {
 	/* Camera-on-a-string mode */

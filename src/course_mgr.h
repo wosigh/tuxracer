@@ -36,10 +36,15 @@ typedef struct {
     char *name;
     char *description;
     scalar_t par_time;
+    race_conditions_t conditions;
+    bool score, speed;
 } open_course_data_t;
  
 void init_course_manager();
 list_t get_open_courses_list( );
+list_t get_speed_courses_list( );
+list_t get_score_courses_list( );
+
 list_t get_events_list(  );
 list_elem_t get_event_by_name( char *event_name );
 char* get_event_name( event_data_t *event );

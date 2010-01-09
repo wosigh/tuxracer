@@ -225,7 +225,7 @@ void reset_particles() {
 } 
 
 static int particle_colour_cb(ClientData cd, Tcl_Interp *ip, 
-			      int argc, char *argv[]) 
+			      int argc, const char *argv[]) 
 {
     scalar_t tmp_arr[4];
     bool_t error = False;

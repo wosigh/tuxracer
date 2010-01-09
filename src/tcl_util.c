@@ -23,9 +23,9 @@
  * Used for grabbing point or vector coordinates, colours, and other things.
  * Puts results into an array of doubles.
  */
-int get_tcl_tuple ( Tcl_Interp *ip, char *inList, scalar_t *p, int n ) 
+int get_tcl_tuple ( Tcl_Interp *ip, const char *inList, scalar_t *p, int n ) 
 {
-    char **indices;
+    const char **indices;
     double tmp;
     int num_doubles;
     int rtn;
@@ -62,9 +62,9 @@ int get_tcl_tuple ( Tcl_Interp *ip, char *inList, scalar_t *p, int n )
 }
 
 /* Parse an n-tuple of ints specified as a tcl-list. */
-int get_tcl_int_tuple( Tcl_Interp *ip, char *inList, int *p, int n ) 
+int get_tcl_int_tuple( Tcl_Interp *ip, const char *inList, int *p, int n ) 
 {
-    char **indices;
+    const char **indices;
     int tmp;
     int num_ints;
     int rtn;

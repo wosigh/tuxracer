@@ -34,20 +34,33 @@
 #include "fog.h"
 #include "viewfrustum.h"
 #include "hud.h"
+#include "hud_training.h"
 #include "part_sys.h"
 #include "game_logic_util.h"
 #include "fonts.h"
 #include "ui_mgr.h"
 #include "joystick.h"
+#include "button.h"
 
 #define NEXT_MODE RACING
 
-static void mouse_cb( int button, int state, int x, int y )
-{
+void come_back_to_game(void) {
+    g_game.race_paused=false;
     set_game_mode( NEXT_MODE );
     winsys_post_redisplay();
 }
 
+
+static void mouse_cb( int button, int state, int x, int y )
+{
+    come_back_to_game();
+}
+
+static void cont_click_cb(button_t *button, void *userdata)
+{
+    training_resume_from_tutorial_explanation();
+    come_back_to_game();
+}
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -62,7 +75,7 @@ void draw_paused_text( void )
     int h = getparam_y_resolution();
     int x_org, y_org;
     int box_width, box_height;
-    char *string;
+    const char *string;
     int string_w, asc, desc;
     font_t *font;
 
@@ -76,7 +89,7 @@ void draw_paused_text( void )
 	print_warning( IMPORTANT_WARNING,
 		       "Couldn't get font for binding paused" );
     } else {
-	string = "Paused";
+	string = Localize("Paused","");
 
 	get_font_metrics( font, string, &string_w, &asc, &desc );
 	
@@ -92,16 +105,36 @@ void draw_paused_text( void )
     }
 }
 
+static button_t * cont_btn = NULL;
 void paused_init(void) 
 {
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( mouse_cb );
+    if(pause_is_for_long_tutorial_explanation())
+        winsys_set_mouse_func( ui_event_mouse_func );
+    else
+        winsys_set_mouse_func( mouse_cb );
+
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( ui_event_motion_func );
+    
+    g_game.race_paused=true;
+
+    point2d_t dummy_pos = {0, 0};
+    cont_btn = button_create( dummy_pos, 150, 40, "instructions_button_label", Localize("Continue","src/paused.c") );
+    button_set_hilit_font_binding( cont_btn, "instructions_button_label_hilit" );
+    button_set_visible( cont_btn, True );
+    button_set_enabled( cont_btn, True );
+    button_set_click_event_cb( cont_btn, cont_click_cb, NULL );
 
     play_music( "paused" );
+}
+
+static void paused_term(void)
+{
+    button_delete( cont_btn );
+    cont_btn = NULL;
 }
 
 void paused_loop( scalar_t time_step )
@@ -112,19 +145,7 @@ void paused_loop( scalar_t time_step )
     height = getparam_y_resolution();
 
     check_gl_error();
-
-    /* Check joystick */
-    if ( is_joystick_active() ) {
-	update_joystick();
-
-	if ( is_joystick_continue_button_down() )
-	{
-	    set_game_mode( NEXT_MODE );
-	    winsys_post_redisplay();
-	    return;
-	}
-    }
-
+    
     new_frame_for_fps_calc();
 
     update_audio();
@@ -159,10 +180,18 @@ void paused_loop( scalar_t time_step )
     set_gl_options( GUI );
 
     ui_setup_display();
-
-    draw_paused_text();
-
+    
+    if (pause_is_for_long_tutorial_explanation()) {
+        button_set_position( cont_btn, make_point2d( 0 + 232 - button_get_width( cont_btn )/2.0, 12 ) );
+        ui_draw();
+    }
+    else {
+        draw_paused_text();
+    }
+    
     draw_hud( plyr );
+    
+    draw_hud_training( plyr );
 
     reshape( width, height );
 
@@ -171,9 +200,10 @@ void paused_loop( scalar_t time_step )
 
 START_KEYBOARD_CB( paused_cb )
 {
-    if ( release ) return;
-    set_game_mode( NEXT_MODE );
-    winsys_post_redisplay();
+    if (g_game.practicing || !pause_is_for_long_tutorial_explanation()) {
+        if ( release ) return;
+        come_back_to_game();
+    }
 }
 END_KEYBOARD_CB
 
@@ -186,5 +216,5 @@ void paused_register()
 
     check_assertion( status == 0, "out of keymap entries" );
 
-    register_loop_funcs( PAUSED, paused_init, paused_loop, NULL );
+    register_loop_funcs( PAUSED, paused_init, paused_loop, paused_term );
 }

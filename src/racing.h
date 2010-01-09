@@ -25,9 +25,14 @@ extern "C"
 #ifndef _RACING_H_
 #define _RACING_H_
 
+/* minimum time to be flying for the flying time to be taken in account in plyr->control.fly_total_time */
+#define FLYING_TIME_LIMIT 1.5
+
 void racing_init();
+void racing_init_for_tutorial(point_t point);
 void racing_loop( scalar_t time_step );
 void racing_register();
+bool_t get_trick_modifier();
 
 #endif
 

@@ -154,6 +154,7 @@ static void init_keytable( game_mode_t mode )
 static void keyboard_handler( unsigned int key, bool_t special, 
 			      bool_t release, int x, int y )
 {
+    TRDebugLog("key : %d ; special : %d ; release : %d ; x : %d ; y : %d \n",key,special,release,x,y);
     static game_mode_t last_mode = NO_MODE;
     key_cb_t *table;
 

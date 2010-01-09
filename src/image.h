@@ -38,7 +38,8 @@ typedef struct
     unsigned char *data;
 } IMAGE;
 
-IMAGE *ImageLoad(char *);
+	IMAGE *ImageLoad(const char *fileName);
+
 
 #endif /* !__IMAGE_H__! */
 

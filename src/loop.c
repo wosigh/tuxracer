@@ -21,6 +21,8 @@
 #include "loop.h"
 #include "ui_mgr.h"
 
+#import "sharedGeneralFunctions.h"
+
 #if defined( HAVE_SDL )
 #   include "SDL.h"
 #endif /* defined( HAVE_SDL ) */
@@ -74,7 +76,13 @@ void register_loop_funcs( game_mode_t mode,
 
 scalar_t get_clock_time()
 {
-#if defined( HAVE_GETTIMEOFDAY )
+#if defined( __APPLE__ )
+    uint64_t nanosec = udate();
+
+    return (scalar_t) nanosec * 1.e-9;
+
+
+#elif defined( HAVE_GETTIMEOFDAY )
 
     struct timeval tv;
     gettimeofday( &tv, NULL );

@@ -35,15 +35,15 @@ typedef struct {
 
 void init_textures();
 
-bool_t load_and_bind_texture( char *binding, char *filename );
+bool_t load_and_bind_texture( const char *binding, const char *filename );
 
-bool_t load_texture( char *texname, char *filename, int repeatable );
-bool_t get_texture( char *texname, texture_node_t **tex );
-bool_t del_texture( char *texname );
+bool_t load_texture( const char *texname, const char *filename, int repeatable );
+bool_t get_texture( const char *texname, texture_node_t **tex );
+bool_t del_texture( const char *texname );
 
-bool_t bind_texture( char *binding, char *texname );
-bool_t get_texture_binding( char *binding, GLuint *texid );
-bool_t unbind_texture( char *binding );
+bool_t bind_texture( const char *binding, const char *texname );
+bool_t get_texture_binding( const char *binding, GLuint *texid );
+bool_t unbind_texture( const char *binding );
 
 void get_current_texture_dimensions( int *width, int *height );
 

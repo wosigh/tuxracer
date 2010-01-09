@@ -27,7 +27,7 @@ extern "C"
 
 vector_t* get_course_normals();
 void reset_course_list();
-void calc_normals();
+void calc_normals(const char *course);
 void setup_course_tex_gen();
 void setup_course_lighting();
 void render_course();
@@ -38,6 +38,8 @@ void set_course_clipping( bool_t state );
 void set_course_eye_point( point_t pt );
 void set_course_fog( bool_t state);
 void draw_fog_plane();
+void course_render_init();
+void course_render_release();
 
 #endif
 

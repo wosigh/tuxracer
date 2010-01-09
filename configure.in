@@ -43,8 +43,8 @@ dnl --------------------------------------------------------------------------
 dnl General options
 dnl --------------------------------------------------------------------------
 TR_CPPFLAGS=""
-TR_CFLAGS="-O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations"
-TR_CXXFLAGS="-O2 -Wall -fomit-frame-pointer -ffast-math -fexpensive-optimizations"
+TR_CFLAGS="-g -O2 -Wall -ffast-math -fexpensive-optimizations"
+TR_CXXFLAGS="-g -O2 -Wall -ffast-math -fexpensive-optimizations"
 TR_LIBS=""
 
 case "$host" in
@@ -288,7 +288,9 @@ if test "x$enable_sdl" != "xno" ; then
 
 fi
 
-
+if test "a" = "a" ; then
+TR_LIBS="$TR_LIBS -framework OpenGLES"
+else
 dnl --------------------------------------------------------------------------
 dnl Check for GL library
 dnl --------------------------------------------------------------------------
@@ -469,7 +471,8 @@ if test "x$has_glx_get_proc" = "xyes" ; then
 
     dnl Check that glXGetProcAddressARB is defined in glx.h
     AC_MSG_CHECKING([whether glx.h defines glXGetProcAddressARB]);
-    AC_TRY_COMPILE( [#include <GL/glx.h>], [ char *foo = (char*) glXGetProcAddressARB; ],
+    AC_TRY_COMPILE( [ #define GLX_GLXEXT_LEGACY 1
+ 					#include <GL/glx.h>], [ char *foo = (char*) glXGetProcAddressARB; ],
                     glx_h_up_to_date=yes, glx_h_up_to_date=no )
     AC_MSG_RESULT([$glx_h_up_to_date])
 
@@ -586,6 +589,7 @@ if test "x$have_SDL" != "xyes" ; then
 
 fi
 
+fi
 
 dnl --------------------------------------------------------------------------
 dnl Other options

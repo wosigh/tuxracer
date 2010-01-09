@@ -54,6 +54,8 @@ scalar_t  get_compression_depth( terrain_t surf_type );
 void      set_tux_pos( player_data_t *plyr, point_t newPos );
 void      update_player_pos( player_data_t *plyr, scalar_t dtime );
 void      init_physical_simulation();
+void 	  init_physical_simulation_at_point(player_data_t *plyr, point_t point);
+
 
 #endif /* _PHYS_SIM_H_ */
 

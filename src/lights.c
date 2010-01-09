@@ -54,7 +54,7 @@ void reset_lights()
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, black );
 }
 
-void setup_course_lighting()
+void setup_course_lighting_for_tux(bool forTux)
 {
     int i;
     light_t *course_lights;
@@ -70,7 +70,18 @@ void setup_course_lighting()
 
 	glLightfv( GL_LIGHT0 + i, GL_AMBIENT, course_lights[i].ambient );
 	glLightfv( GL_LIGHT0 + i, GL_DIFFUSE, course_lights[i].diffuse );
-	glLightfv( GL_LIGHT0 + i, GL_SPECULAR, course_lights[i].specular );
+    GLfloat specular[4];
+    if(forTux)
+        specular[0] = specular[1] = specular[2] = specular[3] = 0;
+    else
+    {
+        specular[0] = course_lights[i].specular[0];
+        specular[1] = course_lights[i].specular[1];
+        specular[2] = course_lights[i].specular[2];
+        specular[3] = course_lights[i].specular[3];
+    }
+
+	glLightfv( GL_LIGHT0 + i, GL_SPECULAR, specular );
 	glLightfv( GL_LIGHT0 + i, GL_POSITION, course_lights[i].position );
 	glLightfv( GL_LIGHT0 + i, GL_SPOT_DIRECTION, 
 		   course_lights[i].spot_direction );
@@ -87,8 +98,13 @@ void setup_course_lighting()
     }
 }
 
+void setup_course_lighting(void)
+{
+    setup_course_lighting_for_tux(false);
+}
+
 static int course_light_cb (ClientData cd, Tcl_Interp *ip, 
-			    int argc, char **argv) 
+			    int argc, const char **argv) 
 {
     int light_num;
     scalar_t tmp_arr[4];

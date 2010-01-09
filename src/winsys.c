@@ -450,7 +450,10 @@ void winsys_exit( int code )
     exit( code );
 }
 
-#else
+void winsys_show_preferences( void )
+{
+}
+#elif defined(HAVE_GLUT)
 
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
@@ -763,6 +766,19 @@ void winsys_exit( int code )
 {
     exit(code);
 }
+
+
+void winsys_show_preferences( void )
+{
+}
+
+#elif defined(__APPLE__)
+
+//defined in touchwinsys.m
+
+#else
+
+#error Not supported yet!
 
 #endif /* defined( HAVE_SDL ) */
 

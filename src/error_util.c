@@ -55,9 +55,9 @@ void handle_error( int exit_code, char *fmt, ... )
 
     va_start( args, fmt );
 
-    fprintf( stderr, "*** " PROG_NAME " error: " );
-    vfprintf( stderr, fmt, args );
-    fprintf( stderr, "\n" );
+    fprintf( stdout, "*** " PROG_NAME " error: " );
+    vfprintf( stdout, fmt, args );
+    fprintf( stdout, "\n" );
 
     va_end( args );
 
@@ -70,9 +70,9 @@ void handle_system_error( int exit_code, char *fmt, ... )
 
     va_start( args, fmt );
 
-    fprintf( stderr, "*** " PROG_NAME " error: " );
-    vfprintf( stderr, fmt, args );
-    fprintf( stderr, " (%s)\n", strerror( errno ) );
+    fprintf( stdout, "*** " PROG_NAME " error: " );
+    vfprintf( stdout, fmt, args );
+    fprintf( stdout, " (%s)\n", strerror( errno ) );
 
     va_end( args );
 

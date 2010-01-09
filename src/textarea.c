@@ -26,12 +26,21 @@
 #include "fonts.h"
 #include "render_util.h"
 
+#ifdef __APPLE__
+#define DEFAULT_ARROW_BUTTON_HEIGHT 15 * 2
+#define DEFAULT_ARROW_BUTTON_WIDTH  27
+#define DEFAULT_ARROW_REGION_WIDTH  36
+#define DEFAULT_ARROW_VERT_SEPARATION  4
+#define DEFAULT_BORDER_WIDTH 2
+#define DEFAULT_TEXT_PAD 4
+#else
 #define DEFAULT_ARROW_BUTTON_HEIGHT 15
 #define DEFAULT_ARROW_BUTTON_WIDTH  27
 #define DEFAULT_ARROW_REGION_WIDTH  36
 #define DEFAULT_ARROW_VERT_SEPARATION  4
 #define DEFAULT_BORDER_WIDTH 4
 #define DEFAULT_TEXT_PAD 4
+#endif
 
 struct textarea_ {
     point2d_t pos;
@@ -267,19 +276,21 @@ void textarea_draw( textarea_t *ta )
 
     glDisable( GL_TEXTURE_2D );
 
-    glColor3dv( (scalar_t*)&ta->border_colour );
+    if(ta->background_colour.a != 0.) {
+        glColor3dv( (scalar_t*)&ta->border_colour );
 
-    glRectf( ta->pos.x, 
-	     ta->pos.y,
-	     ta->pos.x + ta->w,
-	     ta->pos.y + ta->h );
+        glRectf( ta->pos.x, 
+             ta->pos.y,
+             ta->pos.x + ta->w,
+             ta->pos.y + ta->h );
 
-    glColor3dv( (scalar_t*)&ta->background_colour );
+        glColor3dv( (scalar_t*)&ta->background_colour );
 
-    glRectf( ta->pos.x + ta->border_width, 
-	     ta->pos.y + ta->border_width,
-	     ta->pos.x + ta->w - ta->border_width,
-	     ta->pos.y + ta->h - ta->border_width );
+        glRectf( ta->pos.x + ta->border_width, 
+             ta->pos.y + ta->border_width,
+             ta->pos.x + ta->w - ta->border_width,
+             ta->pos.y + ta->h - ta->border_width );
+    }
 
     glEnable( GL_TEXTURE_2D );
 
@@ -291,11 +302,11 @@ void textarea_draw( textarea_t *ta )
 	draw_text_lines( ta, font );
     }
 
-    if ( ta->up_button != NULL ) {
+    if ( ta->up_button != NULL && button_is_enabled(ta->up_button) ) {
 	button_draw( ta->up_button );
     }
 
-    if ( ta->down_button != NULL ) {
+    if ( ta->down_button != NULL && button_is_enabled(ta->down_button) ) {
 	button_draw( ta->down_button ); 
     }
 }

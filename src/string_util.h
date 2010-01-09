@@ -25,8 +25,8 @@ extern "C"
 #ifndef STRING_UTIL
 #define STRING_UTIL
 
-char *string_copy( char *src );
-int string_cmp_no_case( char *s1, char *s2 );
+char *string_copy( const char *src );
+int string_cmp_no_case( const char *s1, const char *s2 );
 void string_to_lower( char *s );
 
 #endif /* STRING_UTIL */

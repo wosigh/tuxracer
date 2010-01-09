@@ -111,7 +111,6 @@ void debug_mode_set_active( debug_mode_t mode, bool_t active )
     debug_setting[ mode ] = active;
 }
 
-#if 0
 void print_debug( debug_mode_t mode, char *fmt, ... )
 {
     va_list args;
@@ -128,10 +127,13 @@ void print_debug( debug_mode_t mode, char *fmt, ... )
     fprintf( stderr, PROG_NAME " debug (%s): ", debug_desc[ mode ] );
     vfprintf( stderr, fmt, args );
     fprintf( stderr, "\n" );
+	
+	printf( PROG_NAME " debug (%s): ", debug_desc[ mode ] );
+    vprintf( fmt, args );
+    printf( "\n" );
 
     va_end( args );
 }
-#endif
 
 
 

@@ -30,7 +30,7 @@ create_hash_table(void)
 }
 
 void
-add_hash_entry(hash_table_t table, char* name, hash_entry_t entry)
+add_hash_entry(hash_table_t table, const char* name, hash_entry_t entry)
 {
   Tcl_HashEntry *hash_entry;
   int           newEntry;
@@ -45,7 +45,7 @@ add_hash_entry(hash_table_t table, char* name, hash_entry_t entry)
 }
 
 bool_t 
-get_hash_entry(hash_table_t table, char *name, hash_entry_t *result)
+get_hash_entry(hash_table_t table, const char *name, hash_entry_t *result)
 {
   Tcl_HashEntry *entry;
  
@@ -62,7 +62,7 @@ get_hash_entry(hash_table_t table, char *name, hash_entry_t *result)
 
 
 bool_t 
-del_hash_entry(hash_table_t table, char *name, hash_entry_t *result)
+del_hash_entry(hash_table_t table, const char *name, hash_entry_t *result)
 {
     Tcl_HashEntry *entry;
 

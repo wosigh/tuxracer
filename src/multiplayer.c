@@ -19,7 +19,14 @@
 
 
 /* This is a placeholder until we get multiplayer support */
+#include "tuxracer.h"
+#import "sharedGeneralFunctions.h"
+
 int local_player()
 {
-    return 0;
+    if (g_game.is_speed_only_mode) {
+        return 1;
+    } else {
+        return 0;
+    }
 }

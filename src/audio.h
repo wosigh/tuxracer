@@ -36,12 +36,18 @@ void bind_sounds_to_context( char *sound_context, char **names, int num_sounds )
 bool_t play_sound( char *sound_context, int loop );
 bool_t halt_sound( char *sound_context );
 bool_t set_sound_volume( char *sound_context, int volume );
-    
+bool_t stop_music( void );
 
 void bind_music_to_context( char *music_context, char *name, int loop );
 bool_t play_music( char *music_context );
 bool_t is_music_playing();
-    
+
+#ifdef __APPLE__
+bool_t mustLoopFromContext(char *context);
+char* uniqueContextFromContext (char* context);
+bool_t isSSFromContext(char *context);
+#endif
+
 void update_audio();
 
 void shutdown_audio();

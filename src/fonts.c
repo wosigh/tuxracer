@@ -53,12 +53,20 @@ void init_fonts()
     initialized = True;
 } 
 
-static bool_t get_font( char *fontname, font_node_t **fontnode )
+static bool_t get_font( const char *fontname, font_node_t **fontnode )
 {
     return get_hash_entry(font_table, fontname, (hash_entry_t*)fontnode);		
 }
 
-bool_t get_font_binding( char *binding, font_t **font )
+void set_font_color(font_t* font, colour_t c) {
+    font->colour=c;
+}
+
+void set_font_size(font_t* font, scalar_t s) {
+    font->size=s;
+}
+
+bool_t get_font_binding( const char *binding, font_t **font )
 {
     if (get_hash_entry(binding_table, binding, (hash_entry_t*)(font))) {
 	return True;
@@ -66,7 +74,7 @@ bool_t get_font_binding( char *binding, font_t **font )
     return False;  
 }
 
-bool_t load_font( char *fontname, char *filename, char *texname )
+bool_t load_font( const char *fontname, const char *filename, const char *texname )
 {
     font_node_t *fontnode;
     tex_font_metrics_t *tfm;
@@ -127,7 +135,7 @@ static bool_t del_font( char *fontname )
     return False;
 }
 
-bool_t bind_font( char *binding, char *fontname, scalar_t size, 
+bool_t bind_font( const char *binding, const char *fontname, scalar_t size, 
 		  colour_t colour )
 {
     font_node_t *fontnode;
@@ -157,7 +165,7 @@ bool_t bind_font( char *binding, char *fontname, scalar_t size,
     return True;
 }
 
-bool_t unbind_font( char *binding )
+bool_t unbind_font( const char *binding )
 {
     font_t *font;
 
@@ -228,7 +236,11 @@ static void start_font_draw( font_t *font )
 	      scale_fact,
 	      scale_fact );
 
+#ifdef __APPLE__DISABLED__
+	glColor4f( (float)font->colour.r, (float)font->colour.g, (float)font->colour.b, (float)font->colour.a );
+#else
     glColor4dv( (scalar_t*) &font->colour );
+#endif
 }
 
 static void end_font_draw( font_t *font )
@@ -241,28 +253,29 @@ void bind_font_texture( font_t *font )
     glBindTexture( GL_TEXTURE_2D, font->node->tex->texture_id );
 }
 
-static void advance( font_t *font, char *string )
+static void advance( font_t *font, const char *string )
 {
     int w, a, d;
     get_font_metrics( font, string, &w, &a, &d );
     glTranslatef( w, 0, 0 );
 }
 
-void draw_character( font_t *font, char c)
-{
-    char buff[2];
+// unused
+//void draw_character( font_t *font, char c)
+//{
+//    char buff[2];
+//
+//    start_font_draw( font );
+//    draw_tex_font_char( font->node->tfm, c );
+//    end_font_draw( font );
+//
+//    buff[0] = c;
+//    buff[1] = '\0';
+//
+//    advance( font, buff );
+//}
 
-    start_font_draw( font );
-    draw_tex_font_char( font->node->tfm, c );
-    end_font_draw( font );
-
-    buff[0] = c;
-    buff[1] = '\0';
-
-    advance( font, buff );
-}
-
-void draw_string( font_t *font, char *string )
+void draw_string( font_t *font, const char *string )
 {
     start_font_draw( font );
     draw_tex_font_string( font->node->tfm, string );
@@ -271,7 +284,7 @@ void draw_string( font_t *font, char *string )
     advance( font, string );
 }
 
-void get_font_metrics( font_t *font, char *string,
+void get_font_metrics( font_t *font, const char *string,
 		       int *width, int *max_ascent, int *max_descent)
 {
     scalar_t scale_fact = get_scale_factor( font );
@@ -283,15 +296,27 @@ void get_font_metrics( font_t *font, char *string,
     *max_descent *= scale_fact;
 }
 
+void get_font_metrics_scalar( font_t *font, const char *string,
+		       scalar_t *width, scalar_t *max_ascent, scalar_t *max_descent)
+{
+    scalar_t scale_fact = get_scale_factor( font );
+    int w, a, d;
+    get_tex_font_string_bbox( font->node->tfm, string, &w, &a, &d );
+
+    *width = w * scale_fact;
+    *max_ascent = a * scale_fact;
+    *max_descent = d * scale_fact;
+}
+
 
 static int load_font_cb (ClientData cd, Tcl_Interp *ip, 
-			 int argc, char *argv[]) 
+			 int argc, const char *argv[]) 
 {
     bool_t error = False;
 
-    char *fontname = NULL;
-    char *filename = NULL;
-    char *texturename = NULL;
+    const char *fontname = NULL;
+    const char *filename = NULL;
+    const char *texturename = NULL;
     
     if (argc < 2) {
 	error = True;
@@ -355,13 +380,13 @@ static int load_font_cb (ClientData cd, Tcl_Interp *ip,
 
 
 static int bind_font_cb (ClientData cd, Tcl_Interp *ip, 
-			 int argc, char *argv[]) 
+			 int argc, const char *argv[]) 
 {
     double tmp_dbl;
     bool_t error = False;
 
-    char *binding = NULL;
-    char *fontname = NULL;
+    const char *binding = NULL;
+    const char *fontname = NULL;
     colour_t colour = white;
     int size = 30;
     

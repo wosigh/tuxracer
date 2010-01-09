@@ -47,6 +47,7 @@
 #include "ui_mgr.h"
 #include "course_mgr.h"
 #include "game_type_select.h"
+#include "racing_mode_select.h"
 #include "race_select.h"
 #include "event_select.h"
 #include "save.h"
@@ -55,6 +56,7 @@
 #include "os_util.h"
 #include "loading.h"
 #include "tcl_util.h"
+#import "sharedGeneralFunctions.h"
 
 #define WINDOW_TITLE "Tux Racer " VERSION
 
@@ -97,7 +99,7 @@ void read_game_init_script()
 	    1, "Can't find the tuxracer data "
 	    "directory.  Please check the\nvalue of `data_dir' in "
 	    "~/.tuxracer/options and set it to the location where you\n"
-	    "installed the tuxracer-data files.\n\n"
+	    "installed the TRWC-data files.\n\n"
 	    "Couldn't chdir to %s", getparam_data_dir() );
     } 
 
@@ -105,7 +107,7 @@ void read_game_init_script()
         handle_error( 1, "error evalating %s/%s: %s\n"
 		      "Please check the value of `data_dir' in ~/.tuxracer/options "
 		      "and make sure it\npoints to the location of the "
-		      "latest version of the tuxracer-data files.", 
+		      "latest version of the TRWC-data files.", 
 		      getparam_data_dir(), GAME_INIT_SCRIPT, 
 		      Tcl_GetStringResult( g_game.tcl_interp ) );
     } 
@@ -120,15 +122,23 @@ void read_game_init_script()
 
     
 
+#ifdef __APPLE__
+int libtuxracer_main( int argc, char **argv )
+#else
 int main( int argc, char **argv ) 
+#endif
 {
     /* Print copyright notice */
-    fprintf( stderr, "Tux Racer " VERSION " -- a Sunspire Studios Production "
+
+    fprintf( stderr, 
+         "Tux Rider World Challenge -- http://www.barlow-server.com\n"
+         "a fork from:\n"
+         "Tux Racer " VERSION " -- a Sunspire Studios Production "
 	     "(http://www.sunspirestudios.com)\n"
 	     "(c) 1999-2000 Jasmin F. Patry "
 	     "<jfpatry@sunspirestudios.com>\n"
 	     "\"Tux Racer\" is a trademark of Jasmin F. Patry\n"
-	     "Tux Racer comes with ABSOLUTELY NO WARRANTY. "
+	     "Tux Rider World Challenge comes with ABSOLUTELY NO WARRANTY. "
 	     "This is free software,\nand you are welcome to redistribute "
 	     "it under certain conditions.\n"
 	     "See http://www.gnu.org/copyleft/gpl.html for details.\n\n" );
@@ -145,7 +155,7 @@ int main( int argc, char **argv )
      */
 
     /* Don't support multiplayer, yet... */
-    g_game.num_players = 1;
+    g_game.num_players = 2;
 
     /* Create a Tcl interpreter */
     g_game.tcl_interp = Tcl_CreateInterp();
@@ -233,11 +243,17 @@ int main( int argc, char **argv )
     /* Need to set up an initial view position for select_course 
        (quadtree simplification)
     */
-
-    g_game.player[local_player()].view.pos = make_point( 0., 0., 0. );
+    
+    //Player 0 = classic mode player ; Player 1 = Speed Only Mode Player
+    
+    g_game.player[0].view.pos = make_point( 0., 0., 0. );
+    g_game.player[1].view.pos = make_point( 0., 0., 0. );
+    
 
     /* Placeholder name until we give players way to enter name */
-    g_game.player[local_player()].name = "noname";
+    g_game.player[0].name = "noname";
+    g_game.player[1].name = "nonameSpeedOnly";
+   
 
     init_preview();
 
@@ -248,6 +264,7 @@ int main( int argc, char **argv )
     paused_register();
     reset_register();
     game_type_select_register();
+    racing_mode_select_register();
     event_select_register();
     race_select_register();
     credits_register();

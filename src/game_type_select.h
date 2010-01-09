@@ -27,7 +27,8 @@ extern "C"
 
 #include "tuxracer.h"
 
-void game_type_select_register();
+	void game_type_select_register();
+	void setActionAfterQuitting(const char* action);
 
 #endif /* GAME_TYPE_SELECT_H */
 

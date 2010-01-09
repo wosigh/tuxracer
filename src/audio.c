@@ -22,10 +22,11 @@
 #if defined(HAVE_SDL) && defined(HAVE_SDL_MIXER)
 
 #include "SDL.h"
-#include "SDL_mixer.h"
+//#include "SDL_mixer.h"
 #include "audio.h"
 #include "audio_data.h"
 #include "hash.h"
+#include "sharedAudioFunctions.h"
 
 typedef struct {
     int num_sounds;
@@ -114,6 +115,7 @@ void init_audio()
 
 	buffer = getparam_audio_buffer_size();
 
+
 	if ( Mix_OpenAudio(hz, format, channels, buffer) < 0 ) {
 	    print_warning( 1,
 			   "Warning: Couldn't set %d Hz %d-bit audio\n"
@@ -127,6 +129,7 @@ void init_audio()
 			 hz, 
 			 getparam_audio_format_mode() == 0 ? 8 : 16 );
 	}
+
     }
 }
 
@@ -145,6 +148,7 @@ bool_t is_audio_open()
     int tmp_channels;
 
     return (bool_t) Mix_QuerySpec( &tmp_freq, &tmp_format, &tmp_channels );
+
 }
 
 /*! 
@@ -243,7 +247,9 @@ void bind_music_to_context( char *music_context, char *name, int loop )
 	if ( current_music_name_ != NULL && 
 	     strcmp( current_music_name_, data->music_name ) == 0 )
 	{
+
 	    Mix_HaltMusic();
+
 	    current_music_name_ = NULL;
 	    current_music_data_ = NULL;
 	    check_assertion( get_music_playing_status( data->music_name ),
@@ -296,7 +302,9 @@ static void flush_cached_sound_chunks()
 	    data->chunks[i] = NULL;
 	}
 	if (data->loop_count == -1) {
+ 
 	    Mix_HaltChannel(data->channel);
+
 	}
     }
     end_hash_scan( iter );
@@ -466,6 +474,7 @@ bool_t play_sound( char *sound_context, int loop )
     Mix_VolumeChunk( chunk, data->volume );
     
     data->channel = Mix_PlayChannel( -1, chunk, loop );
+
     data->loop_count = loop;
 
     return True;
@@ -509,7 +518,9 @@ bool_t halt_sound( char *sound_context )
 	return False;
     }
     if (data->loop_count == -1) {
+ 
 	Mix_HaltChannel( data->channel );
+
     }
 
     data->loop_count = 0;
@@ -546,7 +557,9 @@ bool_t set_sound_volume( char *sound_context, int volume )
 	    check_assertion( found, "sound name not found" );
 	    check_assertion( data->chunks[i]!=NULL, "sound chunk not set" );
 	}
+
 	Mix_VolumeChunk( data->chunks[i], data->volume );
+
     }
     return True;
 }
@@ -585,7 +598,9 @@ bool_t play_music( char *music_context )
 	if ( current_music_name_ != NULL ) {
 	    set_music_playing_status( current_music_name_, False );
 	}
+
 	Mix_HaltMusic();
+
 	current_music_name_ = NULL;
 	current_music_data_ = NULL;
 	return False;
@@ -604,10 +619,12 @@ bool_t play_music( char *music_context )
 	Mix_HaltMusic();
     }
 
+
     if ( ! Mix_PlayingMusic() ) {
 	Mix_PlayMusic( music, loop );
 	set_music_playing_status( music_name, True );
     }
+
 
     current_music_data_ = music;
     current_music_name_ = music_name;
@@ -660,15 +677,17 @@ update_audio()
 	volume = 128;
     }
     setparam_music_volume( volume );
-
+ 
     Mix_VolumeMusic( volume );
 
     /* Update music status */
+
     if ( current_music_name_ != NULL && !Mix_PlayingMusic() ) {
 	set_music_playing_status( current_music_name_, False );
 	current_music_name_ = NULL;
 	current_music_data_ = NULL;
     }
+
 }
 
 
@@ -761,7 +780,9 @@ static int bind_music_cb( ClientData cd, Tcl_Interp *ip,
 void shutdown_audio()
 {
     if ( is_audio_open() ) {
+
 	Mix_CloseAudio();
+
     }
 }
 
@@ -777,36 +798,83 @@ void shutdown_audio()
 */
 void register_sound_tcl_callbacks( Tcl_Interp *ip )
 {
+
     Tcl_CreateCommand (ip, "tux_bind_sounds", bind_sounds_cb,  0,0);
     Tcl_CreateCommand (ip, "tux_bind_music", bind_music_cb,  0,0);
+
 }
 
 
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 #else
+#include "sharedAudioFunctions.h"
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 
+#ifdef TR_DEBUG_MODE
+#define DPRINTF printf
+#else
+#define DPRINTF if(0) printf
+#endif
+
 void init_audio()
 {
+	DPRINTF("init_audio\n");
 }
 
 void bind_sounds_to_context( char *sound_context, char **names, int num_sounds )
 {
+	DPRINTF("bind_sounds_to_context : %s\n", sound_context);
 }
 
 void bind_music_to_context( char *music_context, char *name, int loop )
 {
+	DPRINTF("bind_music_to_context : %s\n", music_context);
+}
+
+//Certaines musiques doivent être loopées, d'autres non
+bool_t mustLoopFromContext(char *context) {
+	if (!strcmp(context,"game_over")) return False;
+	else return True;
+}
+
+//Certains sons sont trop courts pour être joués avec audioQueueServices (j'en suis pas sur mais en tout cas ca plante)
+//Dans ce cas je les joue avec AudioServicesPlaySystemSound (SS= systemSound)
+bool_t isSSFromContext(char *context) {
+	if (!strcmp(context,"item_collect")) return True;
+	else if (!strcmp(context,"hit_tree")) return True;
+	else return False;
+}
+
+//Cette fonction est utile car certains contextes portent des noms différents et servent à jouer la même musique
+char* uniqueContextFromContext (char* context) {
+	if (!strcmp(context,"splash_screen")) return "start_screen";
+	//else if (!strcmp(context,"loading")) return "start_screen";
+	else if (!strcmp(context,"intro")) return "racing";
+	else if (!strcmp(context,"paused")) return "racing";
+	else return context;	
+}
+
+
+bool_t play_music( char *music_context )
+{
+	DPRINTF("play_music : %s\n",music_context);
+	playIphoneMusic(uniqueContextFromContext(music_context),mustLoopFromContext(music_context));
+    return False;
+}
+
+bool_t stop_music( void )
+{
+	DPRINTF("StopMusic\n");
+	stopMusic();
+    return False;
 }
 
 bool_t play_sound( char *sound_context )
 {
-    return False;
-}
-
-bool_t play_music( char *music_context )
-{
+	bool_t isSystemSound = isSSFromContext(sound_context);
+	playIphoneSound(sound_context,isSystemSound);
     return False;
 }
 
@@ -816,39 +884,48 @@ void update_audio()
 
 bool_t is_music_playing()
 {
+	DPRINTF("is_music_playing\n");
     return False;
 }
 
 static int bind_sounds_cb( ClientData cd, Tcl_Interp *ip, 
-			   int argc, char *argv[]) 
+			   int argc, const char *argv[]) 
 {
     return TCL_OK;
 } 
 
 static int bind_music_cb( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
+	DPRINTF("bind_music_cb\n");
     return TCL_OK;
 } 
 
 void register_sound_tcl_callbacks( Tcl_Interp *ip )
 {
+	DPRINTF("register_sound_tcl_callbacks\n");
     Tcl_CreateCommand (ip, "tux_bind_sounds", bind_sounds_cb,  0,0);
     Tcl_CreateCommand (ip, "tux_bind_music", bind_music_cb,  0,0);
 }
 
 bool_t halt_sound( char *sound_context )
 {
+	DPRINTF("halt_sound : %s\n",sound_context);
+	haltSound(uniqueContextFromContext(sound_context));
     return True;
 }
 
 void shutdown_audio()
 {
+    DPRINTF("shutdown_audio\n");
 }
 
 bool_t set_sound_volume( char *sound_context, int volume )
 {
+	//DPRINTF("set_sound_volume : %s, %i\n",sound_context,volume);
+	adjustSoundGain(sound_context, volume);
     return True;
 }
+
 
 #endif /* defined(HAVE_SDL) && defined(HAVE_SDL_MIXER) */

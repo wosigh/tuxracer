@@ -81,13 +81,8 @@ void ui_setup_display()
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-#ifdef WEBOS
     glOrthof( 0, getparam_x_resolution(), 
 	     0, getparam_y_resolution(), -1.0, 1.0 );
-#else
-    glOrtho( 0, getparam_x_resolution(), 
-	     0, getparam_y_resolution(), -1.0, 1.0 );
-#endif
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     glTranslatef( offset, offset, -1.0 );
@@ -527,6 +522,8 @@ static void ui_draw_cursor( void )
 {
     GLuint texobj;
     char *binding;
+    
+    return; // DISABLED
 
     binding = "mouse_cursor";
     if ( !get_texture_binding( binding, &texobj ) ) {
@@ -536,29 +533,32 @@ static void ui_draw_cursor( void )
     ui_setup_display();
 
     glBindTexture( GL_TEXTURE_2D, texobj );
+    
+	#ifdef __APPLE__DISABLED__
+	
+	   const GLfloat vertices []=
+	   {
+	       cursor_pos.x, cursor_pos.y,
+	       cursor_pos.x, cursor_pos.y - CURSOR_TEX_SIZE,
+	       cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y - CURSOR_TEX_SIZE,
+	       cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y
+	   };
 
-#ifdef WEBOS
-    GLfloat t[8] = {
-      0,1,
-      0,0,
-      1,0,
-      1,1,
-    };
+		const GLfloat texCoords []=
+	   {
+	       0,1,
+	       0,0,
+	       1,0,
+	       1,1
+	   };
 
-    GLfloat v[8] = {
-      cursor_pos.x, cursor_pos.y,
-	    cursor_pos.x, cursor_pos.y - CURSOR_TEX_SIZE,
-	    cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y - CURSOR_TEX_SIZE,
-	    cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y,
-    };
+	   glEnableClientState (GL_VERTEX_ARRAY);
+	   glVertexPointer (2, GL_FLOAT , 0, vertices);	
+	   glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+	   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glVertexPointer(2, GL_FLOAT, 0, v);
-  glTexCoordPointer(2, GL_FLOAT, 0, t);
-  glDrawArrays(GL_TRIANGLES, 0, 4);
-
-#else
+	#else
+	
     glBegin( GL_QUADS );
     {
 	glTexCoord2f( 0, 1 );
@@ -579,7 +579,8 @@ static void ui_draw_cursor( void )
 
     }
     glEnd();
-#endif
+    
+    #endif
 }
 
 

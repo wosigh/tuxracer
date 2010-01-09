@@ -35,6 +35,7 @@ extern const colour_t light_blue;
 extern const colour_t blue;
 extern const colour_t black;
 extern const colour_t sky;
+extern const colour_t invisible;
 
 void reshape( int w, int h );
 void flat_mode();

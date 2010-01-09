@@ -33,14 +33,16 @@
 #include "viewfrustum.h"
 #include "keyboard.h"
 #include "hud.h"
+#include "hud_training.h"
 #include "phys_sim.h"
 #include "part_sys.h"
 #include "course_load.h"
+#include "game_config.h"
 #include "joystick.h"
 
 static void abort_intro( player_data_t *plyr ) {
     point2d_t start_pt = get_start_pt();
-
+    
     set_game_mode( RACING );
 
     plyr->orientation_initialized = False;
@@ -56,7 +58,7 @@ void intro_init(void)
 {
     int i, num_items;
     item_t *item_locs;
-
+    
     player_data_t *plyr = get_player_data( local_player() );
     point2d_t start_pt = get_start_pt();
 
@@ -68,6 +70,9 @@ void intro_init(void)
     winsys_set_mouse_func( NULL );
     winsys_set_motion_func( NULL );
     winsys_set_passive_motion_func( NULL );
+    
+    /* order trees */
+    course_render_init();
 
     plyr->orientation_initialized = False;
 
@@ -76,6 +81,12 @@ void intro_init(void)
     g_game.time = 0.0;
     plyr->herring = 0;
     plyr->score = 0;
+    
+#ifdef __APPLE__
+    plyr->tricks = 0;
+    plyr->control.is_flying=False;
+    plyr->control.fly_total_time=0;
+#endif
 
     plyr->pos.x = start_pt.x;
     plyr->pos.z = start_pt.y;
@@ -125,7 +136,12 @@ void intro_loop( scalar_t time_step )
 	    return;
 	}
     }
-    
+
+#ifdef __APPLE__
+    int saved_tux_sphere_divisions = getparam_tux_sphere_divisions();
+    setparam_tux_sphere_divisions(10);
+#endif
+
     new_frame_for_fps_calc();
 
     update_audio();
@@ -148,23 +164,26 @@ void intro_loop( scalar_t time_step )
     set_course_clipping( True );
     set_course_eye_point( plyr->view.pos );
     setup_course_lighting();
-    render_course( );
+    render_course();
     draw_trees();
 
     draw_tux();
     draw_tux_shadow();
 
     draw_hud( plyr );
-
+    draw_hud_training(plyr);
+    
     reshape( width, height );
     winsys_swap_buffers();
+#ifdef __APPLE__
+    setparam_tux_sphere_divisions(saved_tux_sphere_divisions);
+#endif
 } 
 
 START_KEYBOARD_CB( intro_cb )
 {
     if ( release ) return;
-
-    abort_intro( plyr );
+    if (g_game.practicing) abort_intro( plyr );
 }
 END_KEYBOARD_CB
 

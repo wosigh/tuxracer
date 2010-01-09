@@ -28,38 +28,52 @@
 #include "multiplayer.h"
 #include "ui_mgr.h"
 #include "ui_snow.h"
+#include "sharedGeneralFunctions.h"
+#include "textures.h"
 
 #define COORD_OFFSET_AMT -0.5
+
+#define SPLASH_DURATION 2000000000ULL //2 seconde
+#define FADE_DURATION   400000000ULL //0.4 seconde
+
+
 static const colour_t background_colour = { 0.48, 0.63, 0.90, 1.0 };
-static char *logo_bindings[4] = { "splash_screen_tl",
-				  "splash_screen_bl",
-				  "splash_screen_tr",
-				  "splash_screen_br" };
+static char *logo_bindings = "splash_screen";
+static uint64_t time_origin;
+static bool quit_fading_out;
+static bool must_draw_fade_in_out;
 
 static void goto_next_mode()
 {
-    int i;
     set_game_mode( GAME_TYPE_SELECT );
 
     /* 
      * Free textures
      */
-    for (i=0; i<sizeof(logo_bindings)/sizeof(logo_bindings[0]); i++) {
-	unbind_texture( logo_bindings[i] );
-    }
+    unbind_texture( logo_bindings );
     flush_textures();
     winsys_post_redisplay();
 }
 
 static void splash_screen_mouse_func( int button, int state, int x, int y )
 {
-    goto_next_mode();
+	//car sinon a fonction est appelée deux fois, au cick et au release;
+	if (quit_fading_out) return;
+	uint64_t time = udate();
+	/* Si on est déja dans une periode de fade out ca fait rien */
+	if ((time-time_origin)>=(SPLASH_DURATION-FADE_DURATION)) return;
+    time_origin = time;
+	quit_fading_out=true;
+	must_draw_fade_in_out=false;
 }
 
 void splash_screen_init(void) 
 {
     init_ui_snow();
-
+	
+	time_origin = udate();
+	quit_fading_out=false;
+	must_draw_fade_in_out=true;
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
@@ -67,71 +81,44 @@ void splash_screen_init(void)
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( ui_event_motion_func );
 
+#ifndef __APPLE__
     play_music( "splash_screen" );
+#endif
 
     reshape( getparam_x_resolution(), getparam_y_resolution() );
+    
+#ifdef __APPLE__
+    // Skip the splash screen directly
+    //goto_next_mode();
+#endif
 }
 
 
 static void draw_logo()
 {
-    GLuint texid[4];
-    int xoffsets[4] = { -1, -1, 0, 0 };
-    int yoffsets[4] = { 0, -1, 0, -1 };
+    GLuint texid;
     point2d_t ll, ur;
     GLint w, h;
-    int i;
 
     glEnable( GL_TEXTURE_2D );
-
-    for (i=0; i<4; i++) {
-	if ( ! get_texture_binding( logo_bindings[i], &texid[i] ) ) {
-	    return;
-	}
-    }
-
+    get_texture_binding( logo_bindings, &texid );
     glColor4f( 1.0, 1.0, 1.0, 1.0 );
 
-    for (i=0; i<4; i++) {
-	glBindTexture( GL_TEXTURE_2D, texid[i] );
-
-#ifdef WEBOS
-  w = 320;
-  h = 480;
-#else
-	glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w );
-	glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h );
-#endif
-
-	ll.x = getparam_x_resolution()/2 + xoffsets[i]*w;
-	ll.y = getparam_y_resolution()/2 + yoffsets[i]*h;
+	glBindTexture( GL_TEXTURE_2D, texid );
+    
+	#ifdef __APPLE__
+        w = 320;
+        h = 480;
+    #else
+        glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w );
+        glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h );
+    #endif
+    
+	ll.x = getparam_x_resolution()/2 - w/2;
+	ll.y = getparam_y_resolution()/2 - h/2;
 	ur.x = ll.x + w;
 	ur.y = ll.y + h;
 
-
-#ifdef WEBOS
-    {
-  const GLfloat texCoords[8] = {
-	    ll.x, ll.y,
-	    ur.x, ll.y,
-	    ur.x, ur.y,
-	    ll.x, ur.y,
-  };
-
-  const GLfloat vertexCoords[8] = {
-	    0.0, 0.0,
-	    1.0, 0.0,
-	    1.0, 1.0,
-	    0.0, 1.0,
-  };
-
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glVertexPointer(2, GL_FLOAT, 0, vertexCoords);
-  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-  glDrawArrays(GL_TRIANGLES, 0, 4);
-  }
-#else
 	glBegin( GL_QUADS );
 	{
 	    glTexCoord2f( 0.0, 0.0 );
@@ -144,10 +131,73 @@ static void draw_logo()
 	    glVertex2f( ll.x, ur.y );
 	}
 	glEnd();
-#endif
-    }
 }
 
+float fade_in_out_func(uint64_t t) {
+	float result;
+	/* Changement de variable */
+	float x = (float)t/(float)FADE_DURATION;
+	if (t<FADE_DURATION) result = (1.-x);
+	if (t>=FADE_DURATION && t<=(SPLASH_DURATION-FADE_DURATION)) result = 0.0;
+	/* Changement de variable */
+	x = (float)(t-(SPLASH_DURATION-FADE_DURATION))/(float)FADE_DURATION;
+	if (t>(SPLASH_DURATION-FADE_DURATION)) result = x;
+	return result;
+}
+
+float fade_out_func(uint64_t t) {
+	float result;
+	/* Changement de variable */
+	float x = (float)t/(float)FADE_DURATION;
+	if (t<FADE_DURATION) result = x;
+	else result = 1.0;
+	return result;
+}
+
+void draw_fade_in_out() {
+	uint64_t time = udate()-time_origin;
+	if (time>SPLASH_DURATION) goto_next_mode();
+	
+	float alpha = fade_in_out_func(time);
+	
+	printf("time = %f and alpha : %f\n",(float)time,alpha);
+	
+	int w = 320.;
+	int h = 480.;
+	
+	glColor4f(0,0,0,alpha);
+	glBegin( GL_QUADS );
+	{
+	    glVertex2f( 0, 0 );
+		glVertex2f( w, 0 );
+		glVertex2f( w, h );
+		glVertex2f( 0, h );
+	}
+	glEnd();
+}
+
+//appelée quand on clique sur l'écran pour zapper le splash
+void draw_fade_out() {
+	uint64_t time = udate()-time_origin;
+	if (time>FADE_DURATION) goto_next_mode();
+	
+	float alpha = fade_out_func(time);
+	
+	printf("time = %f and alpha : %f\n",(float)time,alpha);
+	
+	int w = 320.;
+	int h = 480.;
+	
+	glColor4f(0,0,0,alpha);
+	glBegin( GL_QUADS );
+	{
+	    glVertex2f( 0, 0 );
+		glVertex2f( w, 0 );
+		glVertex2f( w, h );
+		glVertex2f( 0, h );
+	}
+	glEnd();
+}
 
 void splash_screen_loop( scalar_t time_step )
 {
@@ -162,12 +212,16 @@ void splash_screen_loop( scalar_t time_step )
     ui_setup_display();
 
     if (getparam_ui_snow()) {
-	update_ui_snow( time_step, False );
-	draw_ui_snow();
+		update_ui_snow( time_step, False );
+		draw_ui_snow();
     }
 
     draw_logo();
-
+	
+	if (must_draw_fade_in_out) draw_fade_in_out();
+	
+	if (quit_fading_out) draw_fade_out();
+	
     ui_draw();
 
     reshape( getparam_x_resolution(), getparam_y_resolution() );
@@ -177,7 +231,9 @@ void splash_screen_loop( scalar_t time_step )
 
 START_KEYBOARD_CB( splash_screen_cb )
 {
+#ifndef __APPLE__
     goto_next_mode();
+#endif
 }
 END_KEYBOARD_CB
 

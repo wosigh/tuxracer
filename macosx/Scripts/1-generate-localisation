@@ -1,0 +1,42 @@
+#!/bin/sh
+
+DIR_PATH=`dirname $0`
+cd $DIR_PATH/..
+
+#########################################
+# Generates English Localizable.strings #
+#########################################
+echo "> Generating Localizable.strings files"
+genstrings -o English.lproj/ -s Localize ../src/*.c
+genstrings -o English.lproj/Temp/ Classes/*.m ViewControllers/*.m
+echo "> Combining Localizable.strings files"
+wincent-strings-util --base English.lproj/Localizable.strings --combine English.lproj/Temp/Localizable.strings --output English.lproj/Localizable.strings
+
+########################################
+# Generates *.strings #
+########################################
+for file in `ls English.lproj/*.xib | sed -e "s:English.lproj/::g" | sed -e "s:.xib::g"`
+do
+   echo "> Generating English.lproj/$file.strings"
+   ibtool --generate-strings-file English.lproj/$file.strings English.lproj/$file.xib
+   if [ -e "French.lproj/$file.strings" ]
+   then
+       echo "> Generating French.lproj/$file.new.strings"
+       wincent-strings-util --base English.lproj/$file.strings --extract French.lproj/$file.strings  --output French.lproj/$file.new.strings
+       mate French.lproj/$file.new.strings
+   else
+       echo "> Generating French.lproj/$file.strings"
+       cp English.lproj/$file.strings French.lproj/$file.strings
+       wincent-strings-util --base English.lproj/$file.strings --extract French.lproj/$file.strings  --output French.lproj/$file.new.strings
+       mate French.lproj/$file.new.strings
+   fi
+done
+
+############################################################
+# Generates 2 files whith new translations in French.lproj #
+############################################################
+echo "> Generating 2 files with new translations *.new.xib in French.lproj"
+wincent-strings-util --base English.lproj/Localizable.strings --extract French.lproj/Localizable.strings  --output French.lproj/Localizable.new.strings
+echo "> You can now traduce those two new files and then, execute the script combine-files"
+
+mate French.lproj/Localizable.new.strings

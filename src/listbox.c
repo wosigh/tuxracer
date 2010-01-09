@@ -25,12 +25,21 @@
 #include "render_util.h"
 #include "button.h"
 
+#ifdef __APPLE__
+#define DEFAULT_ARROW_BUTTON_HEIGHT 12 * 3
+#define DEFAULT_ARROW_BUTTON_WIDTH  27 * 2
+#define DEFAULT_ARROW_REGION_WIDTH  36 * 2
+#define DEFAULT_ARROW_VERT_SEPARATION  4 * 4
+#define DEFAULT_BORDER_WIDTH 2
+#define DEFAULT_TEXT_PAD 8
+#else
 #define DEFAULT_ARROW_BUTTON_HEIGHT 15
 #define DEFAULT_ARROW_BUTTON_WIDTH  27
 #define DEFAULT_ARROW_REGION_WIDTH  36
 #define DEFAULT_ARROW_VERT_SEPARATION  4
 #define DEFAULT_BORDER_WIDTH 4
 #define DEFAULT_TEXT_PAD 8
+#endif
 
 struct listbox_ {
     point2d_t pos;
@@ -229,22 +238,24 @@ void listbox_draw( listbox_t *listbox )
     check_assertion( listbox != NULL, "listbox is NULL" );
 
     glDisable( GL_TEXTURE_2D );
+    
+    if(listbox->background_colour.a != 0.0) {
+        glColor4dv( (scalar_t*)&listbox->border_colour );
+        
+        glRectf( listbox->pos.x, 
+             listbox->pos.y,
+             listbox->pos.x + listbox->w - listbox->arrow_width,
+             listbox->pos.y + listbox->h );
 
-    glColor3dv( (scalar_t*)&listbox->border_colour );
+        glColor4dv( (scalar_t*)&listbox->background_colour );
 
-    glRectf( listbox->pos.x, 
-	     listbox->pos.y,
-	     listbox->pos.x + listbox->w - listbox->arrow_width,
-	     listbox->pos.y + listbox->h );
-
-    glColor3dv( (scalar_t*)&listbox->background_colour );
-
-    glRectf( listbox->pos.x + listbox->border_width, 
-	     listbox->pos.y + listbox->border_width,
-	     listbox->pos.x + listbox->w - listbox->border_width -
-	     listbox->arrow_width,
-	     listbox->pos.y + listbox->h - listbox->border_width );
-
+        glRectf( listbox->pos.x + listbox->border_width, 
+             listbox->pos.y + listbox->border_width,
+             listbox->pos.x + listbox->w - listbox->border_width -
+             listbox->arrow_width,
+             listbox->pos.y + listbox->h - listbox->border_width );
+    }
+    
     glEnable( GL_TEXTURE_2D );
 
     if ( !get_font_binding( listbox->font_binding, &font ) ) {
@@ -262,7 +273,7 @@ void listbox_draw( listbox_t *listbox )
 
 	bind_font_texture( font );
 
-	glColor3f( 1.0, 1.0, 1.0 );
+	glColor4f( 1.0, 1.0, 1.0, 1.0 );
 
 	glPushMatrix();
 	{
@@ -339,22 +350,22 @@ listbox_t* listbox_create( point2d_t pos, scalar_t w, scalar_t h,
 
     binding = "listbox_arrows";
 
-    ll = make_point2d( 2.0/64.0, 17.0/64.0 );
-    ur = make_point2d( 29.0/64.0, 32.0/64.0 );
+    ll = make_point2d( 0.0/64.0, 16.0/64.0 );
+    ur = make_point2d( 32.0/64.0, 32.0/64.0 );
     button_set_image( listbox->up_button, binding, ll, ur, white );
 
-    ll = make_point2d( 34.0/64.0, 17.0/64.0 );
-    ur = make_point2d( 61.0/64.0, 32.0/64.0 );
+    ll = make_point2d( 32.0/64.0, 16.0/64.0 );
+    ur = make_point2d( 64.0/64.0, 32.0/64.0 );
     button_set_disabled_image( listbox->up_button, binding, ll, ur, 
 			       white );
 
-    ll = make_point2d( 34.0/64.0, 49.0/64.0 );
-    ur = make_point2d( 61.0/64.0, 64.0/64.0 );
+    ll = make_point2d( 32.0/64.0, 48.0/64.0 );
+    ur = make_point2d( 64.0/64.0, 64.0/64.0 );
     button_set_hilit_image( listbox->up_button, binding, ll, ur, 
 			    white );
 
-    ll = make_point2d( 2.0/64.0, 49.0/64.0 );
-    ur = make_point2d( 29.0/64.0, 64.0/64.0 );
+    ll = make_point2d( 0.0/64.0, 48.0/64.0 );
+    ur = make_point2d( 32.0/64.0, 64.0/64.0 );
     button_set_clicked_image( listbox->up_button, binding, ll, ur, 
 			      white );
 
@@ -373,22 +384,22 @@ listbox_t* listbox_create( point2d_t pos, scalar_t w, scalar_t h,
 
     binding = "listbox_arrows";
 
-    ll = make_point2d( 2.0/64.0, 1.0/64.0 );
-    ur = make_point2d( 29.0/64.0, 16.0/64.0 );
+    ll = make_point2d( 0.0/64.0, 0.0/64.0 );
+    ur = make_point2d( 32.0/64.0, 16.0/64.0 );
     button_set_image( listbox->down_button, binding, ll, ur, white );
 
-    ll = make_point2d( 34.0/64.0, 1.0/64.0 );
-    ur = make_point2d( 61.0/64.0, 16.0/64.0 );
+    ll = make_point2d( 32.0/64.0, 0.0/64.0 );
+    ur = make_point2d( 64.0/64.0, 16.0/64.0 );
     button_set_disabled_image( listbox->down_button, binding, ll, ur, 
 			       white );
 
-    ll = make_point2d( 34.0/64.0, 33.0/64.0 );
-    ur = make_point2d( 61.0/64.0, 48.0/64.0 );
+    ll = make_point2d( 32.0/64.0, 32.0/64.0 );
+    ur = make_point2d( 64.0/64.0, 48.0/64.0 );
     button_set_hilit_image( listbox->down_button, binding, ll, ur, 
 			    white );
 
-    ll = make_point2d( 2.0/64.0, 33.0/64.0 );
-    ur = make_point2d( 29.0/64.0, 48.0/64.0 );
+    ll = make_point2d( 0.0/64.0, 32.0/64.0 );
+    ur = make_point2d( 32.0/64.0, 48.0/64.0 );
     button_set_clicked_image( listbox->down_button, binding, ll, ur, 
 			      white );
 

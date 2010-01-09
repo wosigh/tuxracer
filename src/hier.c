@@ -49,7 +49,7 @@ material_t g_hier_default_material =
 /* Add a new node name to the node name hash table.
    node_name contains the child's name only. */
 static int 
-add_scene_node( char *parent_name, char *node_name, scene_node_t *node ) 
+add_scene_node( const char *parent_name, const char *node_name, scene_node_t *node ) 
 {
     Tcl_HashEntry *entry;
     int newEntry;
@@ -79,7 +79,7 @@ add_scene_node( char *parent_name, char *node_name, scene_node_t *node )
 
 /* Get node pointer from node name */
 int 
-get_scene_node( char *node_name, scene_node_t **node ) 
+get_scene_node( const char *node_name, scene_node_t **node ) 
 {
     Tcl_HashEntry *entry;
   
@@ -101,7 +101,7 @@ get_scene_node( char *node_name, scene_node_t **node )
 
 /* Add a new material name to the material name hash table. */
 int 
-add_material( char *mat_name, material_t *mat ) 
+add_material(const char *mat_name, material_t *mat ) 
 {
     Tcl_HashEntry *entry;
     int newEntry;
@@ -118,7 +118,7 @@ add_material( char *mat_name, material_t *mat )
 
 /* Get material pointer from material name */
 int 
-get_material( char *mat_name, material_t **mat ) 
+get_material(const char *mat_name, material_t **mat ) 
 {
     Tcl_HashEntry *entry;
 
@@ -135,7 +135,7 @@ get_material( char *mat_name, material_t **mat )
 /* Creates a new node, add the node to the hash table, and inserts the
    node into the DAG.  Default values are given to all fields except
    the type-specific ones (geom, param).  */
-char* create_scene_node( char *parent_name, char *child_name, 
+char* create_scene_node( const char *parent_name, const char *child_name, 
 			 scene_node_t **node )
 {
     scene_node_t *parent, *child;
@@ -177,8 +177,8 @@ char* create_scene_node( char *parent_name, char *child_name,
     return NULL;
 } 
 
-char*
-reset_scene_node( char *node ) 
+const char*
+reset_scene_node( const char *node ) 
 {  
     scene_node_t *nodePtr;
 
@@ -192,8 +192,8 @@ reset_scene_node( char *node )
     return NULL;
 }
 
-char*
-rotate_scene_node( char *node, char axis, scalar_t angle ) 
+const char*
+rotate_scene_node( const char *node, char axis, scalar_t angle ) 
 {
     scene_node_t *nodePtr;
     matrixgl_t rotMatrix;
@@ -210,8 +210,8 @@ rotate_scene_node( char *node, char axis, scalar_t angle )
     return NULL;
 }
 
-char*
-translate_scene_node( char *node, vector_t vec ) 
+const char*
+translate_scene_node(const char *node, vector_t vec ) 
 {
     scene_node_t *nodePtr;
     matrixgl_t xlateMatrix;
@@ -228,8 +228,8 @@ translate_scene_node( char *node, vector_t vec )
     return NULL;
 }
 
-char*
-scale_scene_node( char *node, point_t center, scalar_t factor[3] ) 
+const char*
+scale_scene_node(const char *node, point_t center, scalar_t factor[3] ) 
 {
     scene_node_t *nodePtr;
     matrixgl_t matrix;
@@ -256,8 +256,8 @@ scale_scene_node( char *node, point_t center, scalar_t factor[3] )
     return NULL;
 }
 
-char*
-transform_scene_node( char *node, matrixgl_t mat, matrixgl_t invmat ) 
+const char*
+transform_scene_node(const char *node, matrixgl_t mat, matrixgl_t invmat ) 
 {
     scene_node_t *nodePtr;
 
@@ -271,8 +271,8 @@ transform_scene_node( char *node, matrixgl_t mat, matrixgl_t invmat )
     return NULL;
 }
 
-char*
-set_scene_node_material( char *node, char *mat ) 
+const char*
+set_scene_node_material(const char *node,const char *mat ) 
 {
     material_t *matPtr;
     scene_node_t *nodePtr;
@@ -290,8 +290,8 @@ set_scene_node_material( char *node, char *mat )
     return NULL;
 }
 
-char*
-set_scene_node_shadow_state( char *node, char *state ) 
+const char*
+set_scene_node_shadow_state(const char *node, const char *state ) 
 {
     scene_node_t *nodePtr;
 
@@ -310,8 +310,8 @@ set_scene_node_shadow_state( char *node, char *state )
     return NULL;
 }
 
-char*
-set_scene_node_eye( char *node, char *which_eye )
+const char*
+set_scene_node_eye(const char *node, const char *which_eye )
 {
     scene_node_t *nodePtr;
 
@@ -332,8 +332,8 @@ set_scene_node_eye( char *node, char *which_eye )
     return NULL;
 }
 
-char*
-create_tranform_node( char *parent_name, char *child_name ) 
+const char*
+create_tranform_node(const char *parent_name, const char *child_name ) 
 {
     scene_node_t *node;
     char *msg;
@@ -348,8 +348,8 @@ create_tranform_node( char *parent_name, char *child_name )
     return NULL;
 }
 
-char*
-create_sphere_node( char *parent_name, char *child_name, scalar_t resolution ) 
+const char*
+create_sphere_node(const char *parent_name, const char *child_name, scalar_t resolution ) 
 {
     scene_node_t *node;
     char *msg;
@@ -361,17 +361,22 @@ create_sphere_node( char *parent_name, char *child_name, scalar_t resolution )
 
     node->geom = Sphere;
     node->param.sphere.radius = 1.0;
+
+#ifdef __APPLE__
+    node->param.sphere.resolution = resolution;
+#else
     node->param.sphere.divisions = min( 
 	MAX_SPHERE_DIVISIONS, max( 
 	    MIN_SPHERE_DIVISIONS, 
 	    ROUND_TO_NEAREST( getparam_tux_sphere_divisions() * resolution ) 
 	    ) );
+#endif
 
     return NULL;
 }
 
-char*
-create_material( char *mat, colour_t diffuse, 
+const char*
+create_material(const char *mat, colour_t diffuse, 
 		 colour_t specular_colour, scalar_t specular_exp ) 
 {
     material_t *matPtr;
@@ -418,7 +423,7 @@ void initialize_scene_graph()
     Tcl_InitHashTable(&g_hier_material_table,TCL_STRING_KEYS);
 }
 
-void draw_scene_graph( char *node )
+void draw_scene_graph(const char *node )
 {
     scene_node_t *nodePtr;
 
@@ -430,7 +435,7 @@ void draw_scene_graph( char *node )
     
 } 
 
-bool_t collide( char *node, polyhedron_t ph )
+bool_t collide(const char *node, polyhedron_t ph )
 {
     scene_node_t *nodePtr;
     matrixgl_t mat, invmat;

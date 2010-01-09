@@ -119,6 +119,9 @@ void update_ui_snow( scalar_t time_step, bool_t windy )
     push_vector.y = 0;
     push_timestep = 0;
 	
+    float grav_x, grav_y;
+    winsys_get_gravity(&grav_x, &grav_y);
+
     if ( push_position_initialized ) {
 	push_vector.x = push_position.x - last_push_position.x;
 	push_vector.y = push_position.y - last_push_position.y;
@@ -155,9 +158,9 @@ void update_ui_snow( scalar_t time_step, bool_t windy )
 	}
 
 	/* Update velocity */
-	v->x += ( f.x + ( windy ? WIND_FORCE : 0.0 ) - v->x * AIR_DRAG ) * 
+	v->x += ( f.x + GRAVITY_FACTOR * grav_x + ( windy ? WIND_FORCE : 0.0 ) - v->x * AIR_DRAG ) * 
 	    time_step;
-	v->y += ( f.y - GRAVITY_FACTOR - v->y * AIR_DRAG ) * 
+	v->y += ( f.y + GRAVITY_FACTOR * grav_y - v->y * AIR_DRAG ) * 
 	    time_step;
 
 	/* Update position */
@@ -238,33 +241,40 @@ void draw_ui_snow( void )
     {
 	for ( i=0; i<num_particles; i++) {
 	    pt = &particles[i].pt;
-	    size = particles[i].size;
+	    size = particles[i].size / 2;
+        if(size < 5) size = 5;
+        else if(size > 6) size = 6;
 	    tex_min = &particles[i].tex_min;
 	    tex_max = &particles[i].tex_max;
 	    glPushMatrix();
 	    {
 		glTranslatef( pt->x*xres, pt->y*yres, 0 );
-#ifdef WEBOS
-    GLfloat t[8] = {
-		    tex_min->x, tex_min->y,
-		    tex_max->x, tex_min->y,
-		    tex_max->x, tex_max->y,
-		    tex_min->x, tex_max->y,
-    };
+		
+		#ifdef __APPLE__DISABLED__
+    	
+    	   const GLfloat vertices []=
+    	   {
+    	       0, 0,
+    	       size, 0,
+    	       size, size,
+    	       0, size
+    	   };
 
-    GLfloat v[8] = {
-		    0, 0,
-		    size, 0,
-		    size, size,
-		    0, size,
-    };
+    		const GLfloat texCoords []=
+    	   {
+    	       tex_min->x, tex_min->y,
+    	       tex_max->x, tex_min->y,
+    	       tex_max->x, tex_max->y,
+    	       tex_min->x, tex_max->y
+    	   };
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glVertexPointer(2, GL_FLOAT, 0, v);
-  glTexCoordPointer(2, GL_FLOAT, 0, t);
-  glDrawArrays(GL_TRIANGLES, 0, 4);
-#else
+    	   glEnableClientState (GL_VERTEX_ARRAY);
+    	   glVertexPointer (2, GL_FLOAT , 0, vertices);	
+    	   glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+    	   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    	#else
+		
 		glBegin( GL_QUADS );
 		{
 		    glTexCoord2f( tex_min->x, tex_min->y );
@@ -277,7 +287,8 @@ void draw_ui_snow( void )
 		    glVertex2f( 0, size );
 		}
 		glEnd();
-#endif
+		
+		#endif
 	    }
 	    glPopMatrix();
 	} 

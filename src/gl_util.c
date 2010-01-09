@@ -67,10 +67,8 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -86,19 +84,15 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glEnable( GL_TEXTURE_GEN_S );
 	glEnable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
-#ifndef WEBOS
 	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-#endif
         break;
 
     case TEXFONT:
@@ -110,10 +104,8 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -129,10 +121,8 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -148,10 +138,8 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -167,19 +155,15 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glEnable( GL_TEXTURE_GEN_S );
 	glEnable( GL_TEXTURE_GEN_T );
-#endif
 	glEnable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LEQUAL );
 
-#ifndef WEBOS
 	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-#endif
 	break;
 
     case TREES:
@@ -191,10 +175,8 @@ void set_gl_options( RenderMode mode )
         glEnable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -212,10 +194,8 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -233,10 +213,8 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -253,10 +231,8 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_FALSE );
 	glShadeModel( GL_SMOOTH );
@@ -272,10 +248,8 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -291,10 +265,8 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -345,10 +317,8 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
 	glDisable( GL_COLOR_MATERIAL );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDepthMask( GL_FALSE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LEQUAL );
@@ -363,10 +333,8 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-#ifndef WEBOS
 	glDisable( GL_TEXTURE_GEN_S );
 	glDisable( GL_TEXTURE_GEN_T );
-#endif
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -393,7 +361,12 @@ void check_gl_error()
     error = glGetError();
     if ( error != GL_NO_ERROR ) {
 	print_warning( CRITICAL_WARNING, 
-		       "OpenGL Error: %s", gluErrorString( error ) );
+# ifdef __APPLE__
+		       "OpenGL Error: %d", error
+# else
+		       "OpenGL Error: %s", gluErrorString( error )
+# endif
+               );
 	fflush( stderr );
     }
 }
@@ -421,8 +394,8 @@ void init_glfloat_array( int num, GLfloat arr[], ... )
     va_end( args );
 }
 
-#ifndef WEBOS
 /* Extension func ptrs *must* be initialized to NULL */
+#ifndef __APPLE__
 PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p = NULL;
 PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p = NULL;
 #endif
@@ -443,7 +416,7 @@ void init_opengl_extensions()
     get_gl_proc = NULL;
 #endif
 
-#ifndef WEBOS
+#ifndef __APPLE__
     if ( get_gl_proc ) {
 	glLockArraysEXT_p = (PFNGLLOCKARRAYSEXTPROC) 
 	    (*get_gl_proc)( (GLubyte*) "glLockArraysEXT" );
@@ -462,7 +435,7 @@ void init_opengl_extensions()
 	    glUnlockArraysEXT_p = NULL;
 	}
     } else
-#endif 
+#endif
     {
 	print_debug( DEBUG_GL_EXT, 
 		     "No function available for obtaining GL proc addresses" );
@@ -484,13 +457,21 @@ typedef struct {
     GLenum type;
 } gl_value_t;
 
+#ifdef __APPLE__
+// FIXME
+#ifdef GL_INT
+#undef GL_INT
+#endif
+# define GL_INT GL_FIXED
+#endif
+
 /* Add more things here as needed */
 gl_value_t gl_values[] = {
     { "maximum lights", GL_MAX_LIGHTS, GL_INT },
     { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_INT },
     { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_INT },
     { "max texture size", GL_MAX_TEXTURE_SIZE, GL_INT },
-#ifndef WEBOS
+#ifndef __APPLE__
     { "double buffering", GL_DOUBLEBUFFER, GL_UNSIGNED_BYTE },
 #endif
     { "red bits", GL_RED_BITS, GL_INT },
@@ -499,6 +480,11 @@ gl_value_t gl_values[] = {
     { "alpha bits", GL_ALPHA_BITS, GL_INT },
     { "depth bits", GL_DEPTH_BITS, GL_INT },
     { "stencil bits", GL_STENCIL_BITS, GL_INT } };
+
+#ifdef __APPLE__
+// FIXME
+# undef GL_INT
+#endif
 
 void print_gl_info()
 {
@@ -541,11 +527,17 @@ void print_gl_info()
 	fprintf( stderr, "  %s: ", gl_values[i].name );
 
 	switch( gl_values[i].type ) {
+#ifndef __APPLE__
 	case GL_INT:
 	    glGetIntegerv( gl_values[i].value, &int_val );
 	    fprintf( stderr, "%d", int_val );
 	    break;
-
+#else
+	case GL_FIXED:
+	    glGetIntegerv( gl_values[i].value, &int_val );
+	    fprintf( stderr, "%d", int_val );
+	    break;
+#endif
 	case GL_FLOAT:
 	    glGetFloatv( gl_values[i].value, &float_val );
 	    fprintf( stderr, "%f", float_val );

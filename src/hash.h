@@ -33,10 +33,10 @@ typedef void* hash_search_t;
 hash_table_t create_hash_table(void);
 void         del_hash_table(hash_table_t table);
 
-void         add_hash_entry(hash_table_t table, char* name, hash_entry_t entry);
-bool_t       get_hash_entry(hash_table_t table, char *name, 
+void         add_hash_entry(hash_table_t table, const char* name, hash_entry_t entry);
+bool_t       get_hash_entry(hash_table_t table, const char *name, 
 			    hash_entry_t *result);
-bool_t       del_hash_entry(hash_table_t table, char *name,
+bool_t       del_hash_entry(hash_table_t table, const char *name,
 			    hash_entry_t *result);
 
 void	     begin_hash_scan(hash_table_t table, 

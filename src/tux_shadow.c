@@ -98,6 +98,8 @@ void draw_shadow_sphere( matrixgl_t model_matrix )
 
     d_theta = d_phi = M_PI / div;
 
+#ifndef __APPLE__DISABLED__
+// FIXME
     for ( phi = 0.0; phi + eps < M_PI; phi += d_phi ) {
 	scalar_t cos_theta, sin_theta;
 	scalar_t sin_phi, cos_phi;
@@ -108,8 +110,6 @@ void draw_shadow_sphere( matrixgl_t model_matrix )
 	sin_phi_d_phi = sin( phi + d_phi );
 	cos_phi_d_phi = cos( phi + d_phi );
         
-  //FIXME: I need sleep
-#if 0 
         if ( phi <= eps ) {
 
             glBegin( GL_TRIANGLE_FAN );
@@ -182,16 +182,13 @@ void draw_shadow_sphere( matrixgl_t model_matrix )
             glEnd();
 
         } 
-#endif
     } 
-
+#endif
 } 
 
 void draw_shadow_vertex( scalar_t x, scalar_t y, scalar_t z, 
 			 matrixgl_t model_matrix )
 {
-  // FIXME
-#if 0
     point_t pt;
     scalar_t old_y;
     vector_t nml;
@@ -207,6 +204,8 @@ void draw_shadow_vertex( scalar_t x, scalar_t y, scalar_t z,
     if ( pt.y > old_y ) 
 	pt.y = old_y;
 
+#ifndef __APPLE__DISABLED__
+//FIXME
     glNormal3f( nml.x, nml.y, nml.z );
     glVertex3f( pt.x, pt.y, pt.z );
 #endif

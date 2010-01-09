@@ -31,7 +31,7 @@ typedef struct button_ button_t; /* Opaque */
 typedef void (*button_click_event_cb_t)(button_t *button, void *userdata);
 
 button_t* button_create( point2d_t pos, scalar_t w, scalar_t h,
-			 char *font_binding, char *label );
+			 char *font_binding, const char *label );
 void button_delete( button_t *button );
 void button_set_click_event_cb( button_t *button, button_click_event_cb_t cb,
 				void *userdata );
@@ -39,6 +39,7 @@ void button_set_hilit_font_binding( button_t *button, char *binding );
 void button_set_disabled_font_binding( button_t *button, char *binding );
 void button_set_image( button_t *button, char *texture_binding,
 		       point2d_t p0, point2d_t p1, colour_t colour );
+void button_set_label( button_t *button, const char* label );
 void button_set_hilit_image( button_t *button, char *texture_binding,
 			     point2d_t p0, point2d_t p1, colour_t colour );
 void button_set_clicked_image( button_t *button, char *texture_binding,

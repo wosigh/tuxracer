@@ -41,8 +41,9 @@ const colour_t blue  = { 0. , 0. , 1.0, 1.0 };
 const colour_t light_blue = { 0.5, 0.5, 0.8, 1.0 };
 const colour_t black = { 0., 0., 0., 1.0 };
 const colour_t sky   = { 0.82, 0.86, 0.88, 1.0 };
+const colour_t invisible = { 1.0, 1.0, 1.0, 0.0 };
 
-#ifdef WEBOS // EJG: From iphone TRWC
+#ifdef __APPLE__
 const unsigned int PRECISION = 16; 
 GLfixed ONE  = 1 << 16 /*PRECISION*/; 
 const GLfixed ZERO = 0;
@@ -78,7 +79,7 @@ void reshape( int w, int h )
 
     far_clip_dist = getparam_forward_clip_distance() + FAR_CLIP_FUDGE_AMOUNT;
 
-#ifdef WEBOS
+#ifdef __APPLE__
     glesPerspective( getparam_fov(), (scalar_t)w/h, NEAR_CLIP_DIST, 
 		    far_clip_dist );
 #else
@@ -95,18 +96,28 @@ void flat_mode()
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-#ifdef WEBOS
     glOrthof( -0.5, 639.5, -0.5, 479.5, -1.0, 1.0 );
-#else
-    glOrtho( -0.5, 639.5, -0.5, 479.5, -1.0, 1.0 );
-#endif
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 }
 
 void draw_overlay() {
     glColor4f( 0.0, 0.0, 1.0, 0.1 );
+#ifdef __APPLE__DISABLED__
+    const GLfloat vertices []=
+    {
+       0, 0,
+       640, 0,
+       640, 480,
+       0, 480
+    };
+
+    glEnableClientState (GL_VERTEX_ARRAY);
+    glVertexPointer (2, GL_FLOAT , 0, vertices);	
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+#else
     glRecti( 0, 0, 640, 480 );
+#endif
 } 
 
 void clear_rendering_context()
@@ -180,45 +191,35 @@ void draw_billboard( player_data_t *plyr,
 	z_vec.z = plyr->view.inv_view_mat[2][2];
     }
 
-#ifdef WEBOS
-  GLfloat texCoords[8];
-  GLfloat vertexCoords[12];
-    
-	pt = move_point( center_pt, scale_vector( -width/2.0, x_vec ) );
-	pt = move_point( pt, scale_vector( -height/2.0, y_vec ) );
-	glNormal3f( z_vec.x, z_vec.y, z_vec.z );
-  texCoords[0]=min_tex_coord.x;
-  texCoords[1]=min_tex_coord.y;
-  vertexCoords[0]=pt.x;
-  vertexCoords[1]=pt.y;
-  vertexCoords[2]=pt.z;
+#ifdef __APPLE__DISABLED__
+    glNormal3f( z_vec.x, z_vec.y, z_vec.z );
 
-	pt = move_point( pt, scale_vector( width, x_vec ) );
-  texCoords[2]=max_tex_coord.x;
-  texCoords[3]=max_tex_coord.y;
-  vertexCoords[3]=pt.x;
-  vertexCoords[4]=pt.y;
-  vertexCoords[5]=pt.z;
+    pt = move_point( center_pt, scale_vector( -width/2.0, x_vec ) );
+    pt = move_point( pt, scale_vector( -height/2.0, y_vec ) );
+    point_t pt2 = move_point( pt, scale_vector( width, x_vec ) );
+    point_t pt3 = move_point( pt2, scale_vector( height, y_vec ) );
+    point_t pt4 = move_point( pt3, scale_vector( -width, x_vec ) );
 
-	pt = move_point( pt, scale_vector( height, y_vec ) );
-  texCoords[4]=max_tex_coord.x;
-  texCoords[5]=max_tex_coord.y;
-  vertexCoords[6]=pt.x;
-  vertexCoords[7]=pt.y;
-  vertexCoords[8]=pt.z;
+    const GLfloat vertices2 []=
+    {
+       pt.x, pt.y, pt.z,
+       pt2.x, pt2.y, pt2.z,
+       pt3.x, pt3.y, pt3.z,
+       pt4.x, pt4.y, pt4.z
+    };
 
-	pt = move_point( pt, scale_vector( -width, x_vec ) );
-  texCoords[6]=min_tex_coord.x;
-  texCoords[7]=min_tex_coord.y;
-  vertexCoords[9]=pt.x;
-  vertexCoords[10]=pt.y;
-  vertexCoords[11]=pt.z;
+    const GLshort texCoords2 []=
+    {
+       min_tex_coord.x, min_tex_coord.y,
+       max_tex_coord.x, min_tex_coord.y,
+       max_tex_coord.x, max_tex_coord.y,
+       min_tex_coord.x, max_tex_coord.y,
+    };
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
-  glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glEnableClientState (GL_VERTEX_ARRAY);
+    glVertexPointer (3, GL_FLOAT , 0, vertices2);	
+    glTexCoordPointer(2, GL_SHORT, 0, texCoords2);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 #else
     glBegin( GL_QUADS );
     {

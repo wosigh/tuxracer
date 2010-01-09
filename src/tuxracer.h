@@ -60,6 +60,25 @@
         /* Codewarrior 4 seems to need this... */
         int _isnan( double x );
 #   endif /* __MWERKS__ */
+#elif defined(__APPLE__)
+#   define HAVE_FINITE 1
+#   define HAVE_GETCWD 1
+#   define HAVE_GETTIMEOFDAY 1
+#   define HAVE_INTTYPES_H 1
+#   define HAVE_ISNAN 1
+#   define HAVE_MEMORY_H 1
+#   define HAVE_STDINT_H 1
+#   define HAVE_STDLIB_H 1
+#   define HAVE_STRDUP 1
+#   define HAVE_STRINGS_H 1
+#   define HAVE_STRING_H 1
+#   define HAVE_SYS_STAT_H 1
+#   define HAVE_SYS_TIME_H 1
+#   define HAVE_SYS_TYPES_H 1
+#   define HAVE_UNISTD_H 1
+#   define VERSION "0.61pre"
+#   define TCL_HEADER <tcl.h>
+#   include <TargetConditionals.h>
 #endif
 
 /* Include all (or most) system include files here.  This slows down
@@ -98,18 +117,34 @@
 #   include <dirent.h>
 #endif
 
+#include <mach/mach.h>
+#include <mach/mach_time.h>
+
+static inline uint64_t udate(void)
+{
+    /* Get the timebase info */
+    static mach_timebase_info_data_t info = { 0, 0 };
+    
+    if(info.denom == 0)
+        mach_timebase_info(&info);
+    
+    uint64_t start = mach_absolute_time();
+    
+    /* Convert to nanoseconds */
+    start *= info.numer;
+    start /= info.denom;
+    
+    return start;
+}
+
 /* OpenGL */
-#define HAVE_SDL_OPENGLES
-#ifdef HAVE_SDL_OPENGLES
-#include <SDL/SDL_opengles.h>
+#ifdef __APPLE__
+#import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
+#include "iphonegl.h"
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>
-#endif
-
-#define WEBOS
-#ifdef WEBOS
-#include <webos.h>
 #endif
 
 #ifdef HAVE_GL_GLX_H
@@ -176,7 +211,9 @@ tmp |= ((x) >> 8)  & 0x00ff; \
 
 
 /* define this to turn off all debugging assertions/checks */
-/* #define TUXRACER_NO_ASSERT */
+#ifndef TR_DEBUG_MODE
+# define TUXRACER_NO_ASSERT
+#endif
 
 /* Directory separator */
 #ifdef WIN32
@@ -187,8 +224,12 @@ tmp |= ((x) >> 8)  & 0x00ff; \
 
 #define BUFF_LEN 512
 
+#ifdef __APPLE__
+#define MAX_PLAYERS 2
+#else
 /* Multiplayer is not yet supported */
 #define MAX_PLAYERS 1
+#endif
 
 /* Number of lives players get to complete a cup */
 #define INIT_NUM_LIVES 4
@@ -205,6 +246,7 @@ typedef enum {
     SPLASH = 0,
     GAME_TYPE_SELECT,
     EVENT_SELECT,
+    RACING_MODE_SELECT,
     RACE_SELECT,
     LOADING,
     INTRO,
@@ -230,6 +272,7 @@ typedef enum {
     RACE_CONDITIONS_SUNNY,
     RACE_CONDITIONS_CLOUDY,
     RACE_CONDITIONS_NIGHT,
+    RACE_CONDITIONS_EVENING,
     RACE_CONDITIONS_NUM_CONDITIONS
 } race_conditions_t;
 
@@ -260,6 +303,7 @@ typedef enum {
     BEHIND,
     FOLLOW,
     ABOVE,
+    TUXEYE,
     NUM_VIEW_MODES
 } view_mode_t;
 
@@ -288,12 +332,19 @@ typedef struct {
     scalar_t turn_animation;            /* animation step [-1,1] */
     bool_t is_braking;                  /* is player braking? */
     bool_t is_paddling;                 /* is player paddling? */
+    bool_t is_accelerating;				/* is player accelerating? (beause paddling is not continue */
     scalar_t paddle_time;
     bool_t begin_jump;
     bool_t jumping;
     bool_t jump_charging;
     scalar_t jump_amt;
     scalar_t jump_start_time;
+#ifdef __APPLE__
+    bool_t is_flying;                 /* is player flying? */
+    scalar_t fly_start_time;
+    scalar_t fly_end_time;
+    scalar_t fly_total_time;
+#endif
     bool_t barrel_roll_left;
     bool_t barrel_roll_right;
     scalar_t barrel_roll_factor;
@@ -319,8 +370,14 @@ typedef struct {
     bool_t collision;                   /* has plyr collided with obstacle? */
     control_t control;                  /* player control data */
     view_t view;                        /* player's view point */
+    vector_t updir_for_tuxeye;
+    vector_t viewdir_for_tuxeye;
     int herring;                        /* number of fish collected */
     int score;                          /* players' score */
+    int bonus_tricks;                          /* players' bonus from tricks */
+#ifdef __APPLE__
+    int tricks;                          /* number of tricks executed by tux */
+#endif
 } player_data_t;
 
 /* All global data is stored in a variable of this type */
@@ -342,8 +399,20 @@ typedef struct {
     race_data_t race;                   /* info about current race */
     int cup_races_won;                  /* how many races have been won in 
 					   current cup? */
-    bool_t practicing; 			/* are we in practice mode? */
+    bool_t practicing; 			/* are we in practice mode (wich is now the world challenge mode)? Or in training mode ? */ 
     bool_t race_aborted;                /* was the race quit prematurely? */
+#ifdef __APPLE__
+    bool_t race_paused;
+    bool_t needs_save_or_display_rankings;          /* when game is over, before returning to race select, check this */
+    bool_t rankings_displayed;          /* when game is over, before returning to race select, check this */
+    bool_t race_time_over;          /* was the race quit prematurely because remaining time became NULL ? */
+    bool_t is_speed_only_mode;
+	bool_t scores_just_reseted;
+	char* worldRanking;
+	bool_t rankings_loaded;
+	char* countryRanking;
+	char* totalRanking;
+#endif
     scalar_t secs_since_start;          /* seconds since game was started */
 } game_data_t;
 

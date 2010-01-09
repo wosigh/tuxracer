@@ -20,7 +20,7 @@
 #include "tuxracer.h"
 #include "string_util.h"
 
-char *string_copy( char *src ) 
+char *string_copy( const char *src ) 
 {
     char *dest;
 
@@ -36,7 +36,7 @@ char *string_copy( char *src )
     return dest;
 }
 
-int string_cmp_no_case( char *s1, char *s2 )
+int string_cmp_no_case( const char *s1, const char *s2 )
 {
     char *s1c, *s2c;
     int retval;

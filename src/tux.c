@@ -22,6 +22,7 @@
 #include "hier_cb.h"
 #include "hier.h"
 #include "gl_util.h"
+#import "multiplayer.h"
 
 #define MAX_ARM_ANGLE 30.0
 #define MAX_PADDLING_ANGLE 35.0
@@ -132,6 +133,8 @@ void adjust_tux_joints( scalar_t turnFact, bool_t isBraking,
 
 void draw_tux()
 {
+    if(get_player_data(local_player())->view.mode == TUXEYE) return;
+
     GLfloat dummy_colour[]  = { 0.0, 0.0, 0.0, 1.0 };
 
     /* XXX: For some reason, inserting this call here makes Tux render
@@ -143,7 +146,7 @@ void draw_tux()
 
     /* Turn on lights
      */
-    setup_course_lighting();
+    setup_course_lighting_for_tux(true);
 
     draw_scene_graph( tuxRootNode );
 } 
@@ -172,7 +175,7 @@ void load_tux()
 	    1, "Can't find the tuxracer data "
 	    "directory.  Please check the\nvalue of `data_dir' in "
 	    "~/.tuxracer/options and set it to the location where you\n"
-	    "installed the tuxracer-data files.\n\n"
+	    "installed the TRWC-data files.\n\n"
 	    "Couldn't chdir to %s", getparam_data_dir() );
 	/*
         handle_system_error( 1, "couldn't chdir to %s", getparam_data_dir() );
@@ -183,7 +186,7 @@ void load_tux()
         handle_error( 1, "error evalating %s/tux.tcl: %s\n"
 		      "Please check the value of `data_dir' in ~/.tuxracer/options "
 		      "and make sure it\npoints to the location of the "
-		      "latest version of the tuxracer-data files.", 
+		      "latest version of the TRWC-data files.", 
 		      getparam_data_dir(), 
 		      Tcl_GetStringResult( g_game.tcl_interp ) );
     } 
@@ -209,7 +212,7 @@ char* get_tux_tail_joint() { return tuxTailJoint; }
 char* get_tux_neck() { return tuxNeck; } 
 char* get_tux_head() { return tuxHead; } 
 
-static int head_cb ( ClientData cd, Tcl_Interp *ip, int argc, char *argv[]) 
+static int head_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[]) 
 {
     if ( argc != 2 ) {
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
@@ -224,7 +227,7 @@ static int head_cb ( ClientData cd, Tcl_Interp *ip, int argc, char *argv[])
 } 
 
 static int neck_cb ( ClientData cd, Tcl_Interp *ip, 
-		     int argc, char *argv[]) 
+		     int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -240,7 +243,7 @@ static int neck_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int root_node_cb ( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
     if ( argc != 2 ) {
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
@@ -255,7 +258,7 @@ static int root_node_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int left_shoulder_cb ( ClientData cd, Tcl_Interp *ip, 
-			      int argc, char *argv[]) 
+			      int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -271,7 +274,7 @@ static int left_shoulder_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int right_shoulder_cb ( ClientData cd, Tcl_Interp *ip, 
-			       int argc, char *argv[]) 
+			       int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -287,7 +290,7 @@ static int right_shoulder_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int left_hip_cb ( ClientData cd, Tcl_Interp *ip, 
-			 int argc, char *argv[]) 
+			 int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -303,7 +306,7 @@ static int left_hip_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int right_hip_cb ( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -319,7 +322,7 @@ static int right_hip_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int left_knee_cb ( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -335,7 +338,7 @@ static int left_knee_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int right_knee_cb ( ClientData cd, Tcl_Interp *ip, 
-			   int argc, char *argv[]) 
+			   int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -351,7 +354,7 @@ static int right_knee_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int left_ankle_cb ( ClientData cd, Tcl_Interp *ip, 
-			   int argc, char *argv[]) 
+			   int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -367,7 +370,7 @@ static int left_ankle_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int right_ankle_cb ( ClientData cd, Tcl_Interp *ip, 
-			    int argc, char *argv[]) 
+			    int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {
@@ -383,7 +386,7 @@ static int right_ankle_cb ( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int tail_cb ( ClientData cd, Tcl_Interp *ip, 
-		     int argc, char *argv[]) 
+		     int argc, const char *argv[]) 
 {
 
     if ( argc != 2 ) {

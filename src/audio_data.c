@@ -608,7 +608,7 @@ mark_music_data_clean()
    Last Modified: 2000-09-02
 */
 static int load_sound_cb( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
     Tcl_Obj *result;
 
@@ -757,7 +757,7 @@ mark_music_data_clean()
 
 
 static int load_sound_cb( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
     Tcl_Obj *result;
 
@@ -767,7 +767,7 @@ static int load_sound_cb( ClientData cd, Tcl_Interp *ip,
 } 
 
 static int load_music_cb( ClientData cd, Tcl_Interp *ip, 
-			  int argc, char *argv[]) 
+			  int argc, const char *argv[]) 
 {
     Tcl_Obj *result;
 

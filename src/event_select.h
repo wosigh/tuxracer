@@ -26,8 +26,9 @@ extern "C"
 #define EVENT_SELECT_H 1
 
 #include "tuxracer.h"
-
-void event_select_register();
+    
+    void zappe_event_screen(void* button, void* userdata);
+    void event_select_register();
 
 #endif /* EVENT_SELECT_H */
 

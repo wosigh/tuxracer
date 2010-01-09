@@ -98,7 +98,7 @@ void mirror_course()
     reset_course_quadtree();
     if ( nx > 0 && ny > 0 ) {
 	print_debug( DEBUG_QUADTREE, "mirroring quadtree" );
-	init_course_quadtree( elevation, nx, ny, course_width/(nx-1), 
+	init_course_quadtree( NULL, elevation, nx, ny, course_width/(nx-1), 
 			      -course_length/(ny-1),
 			      g_game.player[local_player()].view.pos, 
 			      getparam_course_detail_level() );

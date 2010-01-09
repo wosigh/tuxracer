@@ -26,11 +26,11 @@
  * Callbacks
  */
 
-int tux_rotate( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] ) 
+int tux_rotate( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *nodename;
+    const char *nodename;
     char axis;
     double angle ;
 
@@ -70,11 +70,11 @@ int tux_rotate( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] )
     return TCL_OK;
 }
 
-int tux_translate( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] ) 
+int tux_translate( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *nodename;
+    const char *nodename;
     scalar_t vec[3];
 
     if (3 != argc) {
@@ -105,11 +105,11 @@ int tux_translate( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] )
     return TCL_OK;
 }
 
-int tux_scale( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] ) 
+int tux_scale( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *nodename;
+    const char *nodename;
     scalar_t origin[3];
     scalar_t factors[3]; 
 
@@ -149,12 +149,12 @@ int tux_scale( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] )
     return TCL_OK;
 }
 
-int tux_transform( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] ) 
+int tux_transform( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *parent_name;
-    char *child_name;
+    const char *parent_name;
+    const char *child_name;
 
     if (3 != argc) {
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
@@ -179,12 +179,12 @@ int tux_transform( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] )
     return TCL_OK;
 }
 
-int tux_sphere( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] ) 
+int tux_sphere( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *parent_name;
-    char *child_name;
+    const char *parent_name;
+    const char *child_name;
     double resolution;
 
     if (4 != argc) {
@@ -218,11 +218,11 @@ int tux_sphere( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] )
 }
 
 
-int tux_material( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] ) 
+int tux_material( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *mat_name;
+    const char *mat_name;
     scalar_t diffuse[3];
     scalar_t specular[3];
     double spec_exp;
@@ -271,12 +271,12 @@ int tux_material( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] )
 }
 
 int tux_surfaceproperty( ClientData cd, Tcl_Interp *ip, 
-			 int argc, char *argv[] ) 
+			 int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *node_name;
-    char *mat_name;
+    const char *node_name;
+    const char *mat_name;
 
     if (3 != argc) {
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
@@ -301,12 +301,12 @@ int tux_surfaceproperty( ClientData cd, Tcl_Interp *ip,
     return TCL_OK;
 }
 
-int tux_shadow( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] ) 
+int tux_shadow( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *node_name;
-    char *state;
+    const char *node_name;
+    const char *state;
 
     if (3 != argc) {
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
@@ -328,12 +328,12 @@ int tux_shadow( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] )
     return TCL_OK;
 }
 
-int tux_eye( ClientData cd, Tcl_Interp *ip, int argc, char *argv[] ) 
+int tux_eye( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[] ) 
 {
-    char *errmsg;
+    const char *errmsg;
 
-    char *node_name;
-    char *which_eye;
+    const char *node_name;
+    const char *which_eye;
 
     if (3 != argc) {
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 

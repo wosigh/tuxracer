@@ -28,23 +28,27 @@ extern "C"
 typedef struct font_ font_t;
 
 void init_fonts();
+void set_font_color(font_t* font, colour_t c);
+void set_font_size(font_t* font, scalar_t size);
+scalar_t get_font_size(font_t* font);
 
-bool_t load_font( char *fontname, char *filename, char *texname );
+bool_t load_font( const char *fontname, const char *filename, const char *texname );
 
-bool_t bind_font( char *binding, char *fontname, scalar_t size, 
+bool_t bind_font( const char *binding, const char *fontname, scalar_t size, 
 		  colour_t colour );
-bool_t get_font_binding( char *binding, font_t **font );
-bool_t unbind_font( char *binding );
+bool_t get_font_binding( const char *binding, font_t **font );
+bool_t unbind_font( const char *binding );
 
 bool_t flush_fonts(void);
 
 void bind_font_texture( font_t *font );
-void draw_character( font_t *font, char c);
-void draw_string( font_t *font, char *string);
-void draw_string_with_markup( font_t *font, char *string);
-void get_font_metrics( font_t *font, char *string,
+//void draw_character( font_t *font, char c);
+void draw_string( font_t *font, const char *string);
+void draw_string_with_markup( font_t *font, const char *string);
+void get_font_metrics( font_t *font, const char *string,
 		       int *width, int *max_ascent, int *max_descent);
-
+void get_font_metrics_scalar( font_t *font, const char *string,
+		       scalar_t *width, scalar_t *max_ascent, scalar_t *max_descent);
 void register_font_callbacks(Tcl_Interp *ip);
 
 #endif /* _FONTS_H_ */

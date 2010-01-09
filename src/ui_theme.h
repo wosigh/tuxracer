@@ -31,7 +31,10 @@ extern colour_t ui_background_colour;
 extern colour_t ui_foreground_colour;
 extern colour_t ui_highlight_colour;
 extern colour_t ui_disabled_colour;
-
+#ifdef __APPLE__
+//in TRWC, we want condition button to appear like if it was enabled, but it is disabled
+extern colour_t ui_enabled_but_disabled_colour;
+#endif
 void ui_draw_menu_decorations();
 
 #endif /* UI_THEME_H */

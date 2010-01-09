@@ -35,8 +35,8 @@ void screenshot()
 } 
 
 char* take_screenshot ( char* filename ) {
-#ifdef WEBOS
-  //EJG: Not supported (yet?)
+#ifdef __APPLE__
+    // Not supported
 #else
     Pic *ppmFile;
     Pic_Pixel *scanline;
@@ -62,6 +62,6 @@ char* take_screenshot ( char* filename ) {
     PicClose( ppmFile );
 
     PixelFree(scanline);
-    return (char *)0;
 #endif
+    return (char *)0;
 }

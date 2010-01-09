@@ -166,8 +166,12 @@ typedef enum {
 typedef struct {
     double radius;
 
+#ifndef __APPLE__
     /* How many divisions do we use to draw a sphere? */
     int divisions;
+#else
+    scalar_t resolution;
+#endif
 } sphere_t;
 
 /* Tux's eyes */
@@ -229,6 +233,8 @@ typedef struct {
     int item_type;
     int collectable;
     bool_t drawable;
+	bool_t sponsor_binded;
+    GLuint tid;
 } item_t;
 
 #endif /* TUX_TYPES */

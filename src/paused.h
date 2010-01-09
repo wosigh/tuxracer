@@ -21,16 +21,17 @@
 extern "C"
 {
 #endif
-
+    
 #ifndef _PAUSED_H_
 #define _PAUSED_H_
-
-void paused_init();
-void paused_loop( scalar_t time_step );
-void paused_register();
-
+    
+    void paused_init();
+    void paused_loop( scalar_t time_step );
+    void paused_register();
+    void come_back_to_game();
+        
 #endif
-
+        
 #ifdef __cplusplus
-} /* extern "C" */
+    } /* extern "C" */
 #endif

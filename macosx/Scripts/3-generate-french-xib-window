@@ -1,0 +1,16 @@
+#!/bin/sh
+
+DIR_PATH=`dirname $0`
+cd $DIR_PATH/../
+
+###################################
+# Generates French MainWindow.xib #
+###################################
+for file in `ls English.lproj/*.xib | sed -e "s:English.lproj/::g"`
+do
+  echo "Generating French $file"
+  filenoext=`echo $file | sed -e "s/.xib//"`
+  command="ibtool --strings-file French.lproj/$filenoext.strings --write French.lproj/$file English.lproj/$file"
+  echo $command
+  $command
+done

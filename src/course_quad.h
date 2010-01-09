@@ -29,7 +29,7 @@ extern "C"
 
 void reset_course_quadtree();
 
-void init_course_quadtree( scalar_t *elevation, int nx, int nz, 
+void init_course_quadtree( const char * course, scalar_t *elevation, int nx, int nz, 
 			   scalar_t scalex, scalar_t scalez,
 			   point_t view_pos, scalar_t detail );
 

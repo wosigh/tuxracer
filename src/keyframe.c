@@ -158,7 +158,7 @@ void update_key_frame( player_data_t *plyr, scalar_t dt )
     plyr->orientation_initialized = True;
 } 
 
-static int key_frame_cb ( ClientData cd, Tcl_Interp *ip, int argc, char *argv[]) 
+static int key_frame_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[]) 
 {
     double tmp;
     key_frame_t frame;

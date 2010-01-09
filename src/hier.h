@@ -28,29 +28,29 @@ extern "C"
 #define MIN_SPHERE_DIVISIONS 3
 #define MAX_SPHERE_DIVISIONS 16
 
-extern int get_scene_node( char *node_name, scene_node_t **node );
+extern int get_scene_node( const char *node_name, scene_node_t **node );
 
-extern char* reset_scene_node(char *node);
-extern char* rotate_scene_node(char *node, char axis, scalar_t angle);
-extern char* translate_scene_node(char *node, vector_t trans);
-extern char* scale_scene_node(char *node, point_t origin, scalar_t factor[3]);
-extern char* transform_scene_node(char *node, matrixgl_t mat, matrixgl_t invMat);
+extern const char* reset_scene_node(const char *node);
+extern const char* rotate_scene_node(const char *node, char axis, scalar_t angle);
+extern const char* translate_scene_node(const char *node, vector_t trans);
+extern const char* scale_scene_node(const char *node, point_t origin, scalar_t factor[3]);
+extern const char* transform_scene_node(const char *node, matrixgl_t mat, matrixgl_t invMat);
 
-extern char* set_scene_node_material(char *node, char *mat);
-extern char* create_material(char *mat, colour_t d, colour_t s, scalar_t s_exp);
+extern const char* set_scene_node_material(const char *node, const char *mat);
+extern const char* create_material(const char *mat, colour_t d, colour_t s, scalar_t s_exp);
 
-extern char* set_scene_resolution(char *resolution);
+extern const char* set_scene_resolution(const char *resolution);
 
-extern char* set_scene_node_shadow_state( char *node, char *state );
-extern char* set_scene_node_eye( char *node, char *which_eye );
+extern const char* set_scene_node_shadow_state(const char *node, const char *state );
+extern const char* set_scene_node_eye(const char *node, const char *which_eye );
 
-extern char* create_tranform_node(char *parent, char *name);
-extern char* create_sphere_node( char *parent_name, char *child_name, scalar_t resolution );
+extern const char* create_tranform_node(const char *parent, const char *name);
+extern const char* create_sphere_node(const char *parent_name, const char *child_name, scalar_t resolution );
 
 extern void initialize_scene_graph();
 
-extern void draw_scene_graph( char *node );
-extern  bool_t collide( char *node, polyhedron_t ph );
+extern void draw_scene_graph( const char *node );
+extern  bool_t collide( const char *node, polyhedron_t ph );
 
 #endif
 

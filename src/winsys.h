@@ -26,9 +26,12 @@
 #   include "SDL.h"
 #elif defined( HAVE_GLUT )
 #   include "GL/glut.h"
+#elif defined( __APPLE__ )
+
 #else
 #   error "Neither SDL nor GLUT are present."
 #endif
+
 
 #ifdef __cplusplus
 extern "C"
@@ -122,7 +125,7 @@ typedef enum {
     WS_MOUSE_UP = SDL_RELEASED
 } winsys_button_state_t;
 
-#else
+#elif defined(HAVE_GLUT)
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 /* GLUT version */
@@ -210,6 +213,95 @@ typedef enum {
     WS_MOUSE_UP = GLUT_UP
 } winsys_button_state_t;
 
+#elif defined(__APPLE__)
+
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+/* GLUT version */
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+
+/* GLUT doesn't define as many keysyms as SDL; we map those to 
+   WSK_NOT_AVAIL (0) */
+
+typedef enum {
+    WSK_NOT_AVAIL = 0,
+
+    /* Numeric keypad */
+    WSK_KP0 = 0,
+    WSK_KP1 = 0,
+    WSK_KP2 = 0,
+    WSK_KP3 = 0,
+    WSK_KP4 = 0,
+    WSK_KP5 = 0,
+    WSK_KP6 = 0,
+    WSK_KP7 = 0,
+    WSK_KP8 = 0,
+    WSK_KP9 = 0,
+    WSK_KP_PERIOD = 0,
+    WSK_KP_DIVIDE = 0,
+    WSK_KP_MULTIPLY = 0,
+    WSK_KP_MINUS = 0,
+    WSK_KP_PLUS = 0,
+    WSK_KP_ENTER = 0,
+    WSK_KP_EQUALS = 0,
+
+    /* Arrows + Home/End pad */
+    WSK_UP,
+    WSK_DOWN,
+    WSK_RIGHT,
+    WSK_LEFT,
+    WSK_INSERT,
+    WSK_HOME,
+    WSK_END,
+    WSK_PAGEUP,
+    WSK_PAGEDOWN,
+
+    /* Function keys */
+    WSK_F1,
+    WSK_F2,
+    WSK_F3,
+    WSK_F4,
+    WSK_F5,
+    WSK_F6,
+    WSK_F7,
+    WSK_F8,
+    WSK_F9,
+    WSK_F10,
+    WSK_F11,
+    WSK_F12,
+    WSK_F13 = 0,
+    WSK_F14 = 0,
+    WSK_F15 = 0,
+
+    /* Key state modifier keys */
+    WSK_NUMLOCK = 0,
+    WSK_CAPSLOCK = 0,
+    WSK_SCROLLOCK = 0,
+    WSK_RSHIFT = 0,
+    WSK_LSHIFT = 0,
+    WSK_RCTRL = 0,
+    WSK_LCTRL = 0,
+    WSK_RALT = 0,
+    WSK_LALT = 0,
+    WSK_RMETA = 0,
+    WSK_LMETA = 0,
+
+    WSK_LAST = UCHAR_MAX /* GLUT doesn't define a max key, but this is more
+			    than enough as of version 3.7 */
+} winsys_keysym_t;
+
+typedef enum {
+    WS_LEFT_BUTTON,
+    WS_MIDDLE_BUTTON,
+    WS_RIGHT_BUTTON
+} winsys_mouse_button_t;
+
+typedef enum {
+    WS_MOUSE_DOWN,
+    WS_MOUSE_UP
+} winsys_button_state_t;
+
 #endif /* defined( HAVE_SDL ) */
 
 
@@ -232,6 +324,11 @@ void winsys_set_mouse_func( winsys_mouse_func_t func );
 void winsys_set_motion_func( winsys_motion_func_t func );
 void winsys_set_passive_motion_func( winsys_motion_func_t func );
 
+void winsys_set_high_framerate( bool_t highframerate );
+
+#define Localize(key, comment) winsys_localized_string(key, comment)
+const char * winsys_localized_string( const char * key, const char * comment );
+
 void winsys_swap_buffers();
 void winsys_enable_key_repeat( bool_t enabled );
 void winsys_warp_pointer( int x, int y );
@@ -239,6 +336,8 @@ void winsys_show_cursor( bool_t visible );
 
 void winsys_init( int *argc, char **argv, char *window_title,
 		  char *icon_title );
+void winsys_get_gravity(float * grav_x, float * grav_y);
+
 void winsys_shutdown();
 
 void winsys_process_events(); /* Never returns */
@@ -246,7 +345,11 @@ void winsys_process_events(); /* Never returns */
 void winsys_atexit( winsys_atexit_func_t func );
 
 void winsys_exit( int code );
-
+void winsys_show_preferences( void );
+void winsys_perform_on_main_thread_sync0( void (*func)(void) );
+void winsys_perform_on_main_thread_sync1( void (*func)(void*), void * arg1 );
+void winsys_perform_on_main_thread_sync2( void (*func)(void*, void*), void * arg1, void * arg2 );
+    void winsys_show_rankings( void );
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

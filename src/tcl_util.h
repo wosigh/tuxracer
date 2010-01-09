@@ -27,8 +27,8 @@ extern "C"
 
 #include "tuxracer.h"
 
-int       get_tcl_tuple ( Tcl_Interp *ip, char *inList, scalar_t *p, int n );
-int       get_tcl_int_tuple( Tcl_Interp *ip, char *inList, int *p, int n );
+int       get_tcl_tuple ( Tcl_Interp *ip, const char *inList, scalar_t *p, int n );
+int       get_tcl_int_tuple( Tcl_Interp *ip, const char *inList, int *p, int n );
 point2d_t make_point2d_from_array ( scalar_t *p );
 point_t   make_point_from_array ( scalar_t *p );
 vector_t  make_vector_from_array ( scalar_t *v );
