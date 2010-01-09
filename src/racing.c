@@ -41,7 +41,6 @@
 #include "hud_training.h"
 #include "joystick.h"
 #include "bonus.h"
-#import "sharedGeneralFunctions.h"
 
 /* Time constant for automatic steering centering (s) */
 #define TURN_DECAY_TIME_CONSTANT 0.5
@@ -163,8 +162,12 @@ void racing_loop( scalar_t time_step )
 {
     int width, height;
     player_data_t *plyr = get_player_data( local_player() );
+    bool_t joy_left_turn = False;
+    bool_t joy_right_turn = False;
+    scalar_t joy_turn_fact = 0.0;
     bool_t joy_paddling = False;
     bool_t joy_braking = False;
+    bool_t joy_tricks = False;
     bool_t joy_charging = False;
     bool_t airborne;
     vector_t dir;
@@ -191,13 +194,79 @@ void racing_loop( scalar_t time_step )
     clear_rendering_context();
     
     setup_fog();
+
+    /*
+     * Joystick
+     */
+    if ( is_joystick_active() ) {
+	scalar_t joy_x;
+	scalar_t joy_y;
+
+	update_joystick();
+
+	joy_x = get_joystick_x_axis();
+	joy_y = get_joystick_y_axis();
+
+	if ( joy_x > 0.1 ) {
+	    joy_right_turn = True;
+	    joy_turn_fact = joy_x;
+	} else if ( joy_x < -0.1 ) {
+	    joy_left_turn = True;
+	    joy_turn_fact = joy_x;
+	}
+
+	if ( getparam_joystick_brake_button() >= 0 ) {
+	    joy_braking = 
+		is_joystick_button_down( getparam_joystick_brake_button() );
+	} 
+	if ( !joy_braking ) {
+	    joy_braking = (bool_t) ( joy_y > 0.5 );
+	}
+
+	if ( getparam_joystick_paddle_button() >= 0 ) {
+	    joy_paddling = 
+		is_joystick_button_down( getparam_joystick_paddle_button() );
+	}
+	if ( !joy_paddling ) {
+	    joy_paddling = (bool_t) ( joy_y < -0.5 );
+	}
+
+	if ( getparam_joystick_jump_button() >= 0 ) {
+	    joy_charging = 
+		is_joystick_button_down( getparam_joystick_jump_button() );
+	}
+
+	if ( getparam_joystick_trick_button() >= 0 ) {
+	    joy_tricks = 
+		is_joystick_button_down( getparam_joystick_trick_button() );
+	}
+    }
     
     /* Update braking */
     plyr->control.is_braking = (bool_t) ( braking || joy_braking );
     
     if ( airborne ) {
         new_terrain = (1<<NumTerrains);
-        
+
+       	/*
+	 * Tricks
+	 */
+	if ( trick_modifier || joy_tricks ) {
+	    if ( left_turn || joy_left_turn ) {
+		plyr->control.barrel_roll_left = True;
+	    }
+	    if ( right_turn || joy_right_turn ) {
+		plyr->control.barrel_roll_right = True;
+	    }
+	    if ( paddling || joy_paddling ) {
+		plyr->control.front_flip = True;
+	    }
+	    if ( plyr->control.is_braking ) {
+		plyr->control.back_flip = True;
+	    }
+	}
+ 
+#if 0
         /*
          * Tricks
          */
@@ -228,6 +297,7 @@ void racing_loop( scalar_t time_step )
             TRDebugLog("tricks : %d",plyr->tricks);
 #endif
         }
+#endif
         
         
     } else {
@@ -263,6 +333,7 @@ void racing_loop( scalar_t time_step )
     }
     
     
+#if 0
     /* 
      * Turning 
      */
@@ -282,6 +353,35 @@ void racing_loop( scalar_t time_step )
     
     plyr->control.turn_fact = iPhone_turn_fact;
     plyr->control.turn_animation = iPhone_turn_fact;
+#else
+    /* 
+     * Turning 
+     */
+    if ( ( left_turn || joy_left_turn )  ^ (right_turn || joy_right_turn ) ) {
+	bool_t turning_left = (bool_t) ( left_turn || joy_left_turn );
+
+	if ( joy_left_turn || joy_right_turn ) {
+	    plyr->control.turn_fact = joy_turn_fact;
+	} else {
+	    plyr->control.turn_fact = (turning_left?-1:1);
+	}
+
+	plyr->control.turn_animation += (turning_left?-1:1) *
+	    0.15 * time_step / 0.05;
+	plyr->control.turn_animation = 
+	    min(1.0, max(-1.0, plyr->control.turn_animation));
+    } else {
+	plyr->control.turn_fact = 0;
+
+	/* Decay turn animation */
+	if ( time_step < ROLL_DECAY_TIME_CONSTANT ) {
+	    plyr->control.turn_animation *= 
+		1.0 - time_step/ROLL_DECAY_TIME_CONSTANT;
+	} else {
+	    plyr->control.turn_animation = 0.0;
+	}
+    }
+#endif
     
     
     /*

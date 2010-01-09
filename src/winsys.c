@@ -253,6 +253,12 @@ void winsys_init( int *argc, char **argv, char *window_title,
 	handle_error( 1, "Couldn't initialize SDL: %s", SDL_GetError() );
     }
 
+    /* 
+     * Use GLES 1.1 
+     */
+
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
     /* 
      * Init video 

@@ -20,7 +20,6 @@
 
 /* This is a placeholder until we get multiplayer support */
 #include "tuxracer.h"
-#import "sharedGeneralFunctions.h"
 
 int local_player()
 {

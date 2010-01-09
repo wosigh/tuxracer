@@ -28,7 +28,6 @@
 #include "multiplayer.h"
 #include "ui_mgr.h"
 #include "ui_snow.h"
-#include "sharedGeneralFunctions.h"
 #include "textures.h"
 
 #define COORD_OFFSET_AMT -0.5
@@ -160,8 +159,6 @@ void draw_fade_in_out() {
 	
 	float alpha = fade_in_out_func(time);
 	
-	printf("time = %f and alpha : %f\n",(float)time,alpha);
-	
 	int w = 320.;
 	int h = 480.;
 	
@@ -182,8 +179,6 @@ void draw_fade_out() {
 	if (time>FADE_DURATION) goto_next_mode();
 	
 	float alpha = fade_out_func(time);
-	
-	printf("time = %f and alpha : %f\n",(float)time,alpha);
 	
 	int w = 320.;
 	int h = 480.;

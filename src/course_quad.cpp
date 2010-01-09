@@ -94,7 +94,9 @@ extern "C" void init_course_quadtree( const char * course, scalar_t *elevation, 
                 handle_system_error( 1, "can't open file failed" );
             }
 
+#ifdef TR_DEBUG_MODE
             TRDebugLog("mapping to memory quadtree.data\n");
+#endif
             size_t len = buf.st_size;
             void * archive = mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0);
             if ( archive == (void *)-1 ) {

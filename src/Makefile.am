@@ -1,6 +1,6 @@
-lib_LIBRARIES = libtuxracer.a
+bin_PROGRAMS = tuxracer
 
-libtuxracer_a_SOURCES =				\
+tuxracer_SOURCES =				\
 	alglib.c				\
 	alglib.h				\
 	audio.c					\

@@ -29,7 +29,6 @@
 #include "course_quad.h"
 #include "viewfrustum.h"
 #include "track_marks.h"
-#include "sharedGeneralFunctions.h"
 #include "multiplayer.h"
 
 #include <sys/mman.h>
@@ -108,8 +107,11 @@ void calc_normals(const char *course)
         munmap(nmls, nmls_len);
         close(nmls_fd);
     }
-    else
+#if 0
+    else {
         free(nmls);
+    }
+#endif
 	
     struct stat buf;
     int exists = (stat(buff, &buf) == 0);

@@ -40,7 +40,6 @@
 #include "ui_snow.h"
 #include "joystick.h"
 #include "hud_training.h"
-#import "sharedGeneralFunctions.h"
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 480

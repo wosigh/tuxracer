@@ -20,6 +20,8 @@
 #ifndef _TUXRACER_H_
 #define _TUXRACER_H_
 
+#define __APPLE__
+
 #ifdef HAVE_CONFIG_H
 #   include <config.h>
 #endif
@@ -76,9 +78,11 @@
 #   define HAVE_SYS_TIME_H 1
 #   define HAVE_SYS_TYPES_H 1
 #   define HAVE_UNISTD_H 1
+#   define HAVE_SDL 1
+#   define HAVE_SDL_MIXER 1
+#   define HAVE_SDL_JOYSTICKOPEN 1
 #   define VERSION "0.61pre"
 #   define TCL_HEADER <tcl.h>
-#   include <TargetConditionals.h>
 #endif
 
 /* Include all (or most) system include files here.  This slows down
@@ -117,11 +121,15 @@
 #   include <dirent.h>
 #endif
 
-#include <mach/mach.h>
-#include <mach/mach_time.h>
-
+#include <stdint.h>
 static inline uint64_t udate(void)
 {
+  struct timespec ts;
+  clock_gettime(CLOCK_REALTIME, &ts);
+
+  uint64_t start = (uint64_t)((ts.tv_sec * 1000000000) + ts.tv_nsec) & 0xffffffff;
+  return start;
+#if 0
     /* Get the timebase info */
     static mach_timebase_info_data_t info = { 0, 0 };
     
@@ -135,12 +143,12 @@ static inline uint64_t udate(void)
     start /= info.denom;
     
     return start;
+#endif
 }
 
 /* OpenGL */
 #ifdef __APPLE__
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
+#include <SDL_opengles.h>
 #include "iphonegl.h"
 #else
 #include <GL/gl.h>
@@ -211,6 +219,14 @@ tmp |= ((x) >> 8)  & 0x00ff; \
 
 
 /* define this to turn off all debugging assertions/checks */
+#undef TR_DEBUG_MODE
+
+#ifdef TR_DEBUG_MODE
+#define TRDebugLog printf
+#else
+#define TRDebugLog
+#endif
+
 #ifndef TR_DEBUG_MODE
 # define TUXRACER_NO_ASSERT
 #endif

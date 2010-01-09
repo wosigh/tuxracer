@@ -32,7 +32,6 @@
 #include "joystick.h"
 #include "textures.h"
 #include "fonts.h"
-#include "sharedGeneralFunctions.h"
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 480

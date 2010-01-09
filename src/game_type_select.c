@@ -32,7 +32,6 @@
 #include "joystick.h"
 #include "event_select.h"
 #include "winsys.h"
-#include "sharedGeneralFunctions.h"
 
 static button_t *enter_event_btn = NULL;
 static button_t *practice_btn = NULL;

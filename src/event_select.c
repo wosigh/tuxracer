@@ -160,7 +160,6 @@ static void continue_click_cb( button_t *button, void *userdata )
 }
 
 
-#import "sharedGeneralFunctions.h"
 
 
 static void set_widget_positions_and_draw_decorations()

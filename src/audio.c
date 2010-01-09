@@ -26,7 +26,6 @@
 #include "audio.h"
 #include "audio_data.h"
 #include "hash.h"
-#include "sharedAudioFunctions.h"
 
 typedef struct {
     int num_sounds;
@@ -808,6 +807,7 @@ void register_sound_tcl_callbacks( Tcl_Interp *ip )
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 #else
+#error NO
 #include "sharedAudioFunctions.h"
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/

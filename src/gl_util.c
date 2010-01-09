@@ -360,9 +360,10 @@ void check_gl_error()
     GLenum error;
     error = glGetError();
     if ( error != GL_NO_ERROR ) {
+      printf("OPENGLES ERROR: %x\n", error);
 	print_warning( CRITICAL_WARNING, 
 # ifdef __APPLE__
-		       "OpenGL Error: %d", error
+		       "OpenGL Error: %x", error
 # else
 		       "OpenGL Error: %s", gluErrorString( error )
 # endif

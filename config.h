@@ -1,62 +1,65 @@
+/* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define to empty if the keyword does not work.  */
-#undef const
+/* #undef const */
 
 /* Define if you have the ANSI C header files.  */
-#undef STDC_HEADERS
+#define STDC_HEADERS 1
 
 /* Define if you can safely include both <sys/time.h> and <time.h>.  */
-#undef TIME_WITH_SYS_TIME
+#define TIME_WITH_SYS_TIME 1
 
 /* Define if the X Window System is missing or not being used.  */
-#undef X_DISPLAY_MISSING
+#define X_DISPLAY_MISSING 1
 
 /* Define if you have the SDL_JoystickOpen function.  */
-#undef HAVE_SDL_JOYSTICKOPEN
+#define HAVE_SDL_JOYSTICKOPEN 1
 
 /* Define if you have the _finite function.  */
-#undef HAVE__FINITE
+/* #undef HAVE__FINITE */
 
 /* Define if you have the _isnan function.  */
-#undef HAVE__ISNAN
+/* #undef HAVE__ISNAN */
 
 /* Define if you have the finite function.  */
-#undef HAVE_FINITE
+#define HAVE_FINITE 1
 
 /* Define if you have the getcwd function.  */
-#undef HAVE_GETCWD
+#define HAVE_GETCWD 1
 
 /* Define if you have the gettimeofday function.  */
-#undef HAVE_GETTIMEOFDAY
+#define HAVE_GETTIMEOFDAY 1
 
 /* Define if you have the glXGetProcAddressARB function.  */
-#undef HAVE_GLXGETPROCADDRESSARB
+/* #undef HAVE_GLXGETPROCADDRESSARB */
 
 /* Define if you have the isnan function.  */
-#undef HAVE_ISNAN
+#define HAVE_ISNAN 1
 
 /* Define if you have the strdup function.  */
-#undef HAVE_STRDUP
+#define HAVE_STRDUP 1
 
 /* Define if you have the <GL/glext.h> header file.  */
-#undef HAVE_GL_GLEXT_H
+/* #undef HAVE_GL_GLEXT_H */
 
 /* Define if you have the <GL/glx.h> header file.  */
-#undef HAVE_GL_GLX_H
+/* #undef HAVE_GL_GLX_H */
 
 /* Define if you have the <ieeefp.h> header file.  */
-#undef HAVE_IEEEFP_H
+/* #undef HAVE_IEEEFP_H */
 
 /* Define if you have the <sys/time.h> header file.  */
-#undef HAVE_SYS_TIME_H
+#define HAVE_SYS_TIME_H 1
 
 /* Define if you have the <unistd.h> header file.  */
-#undef HAVE_UNISTD_H
+#define HAVE_UNISTD_H 1
 
 /* Name of package */
-#undef PACKAGE
+#define PACKAGE "tuxracer"
 
+#if 0
 /* Version number of package */
-#undef VERSION
+#define VERSION "0.61"
+#endif
 

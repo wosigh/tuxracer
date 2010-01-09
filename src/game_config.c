@@ -78,12 +78,11 @@
 #ifndef DATA_DIR
 #  if defined( WIN32 )
 #    define DATA_DIR "."
+#  else
+#    define DATA_DIR "/usr/local/share/tuxracer"
 #  endif /* defined( WIN32 ) */
 #endif
 
-#ifdef __APPLE__
-#import "sharedGeneralFunctions.h"
-#endif
 
 /* Identifies the parameter type */
 typedef enum {
@@ -426,7 +425,7 @@ static struct params Params;
 
 void init_game_configuration()
 {
-#ifdef __APPLE__
+#ifdef __APPLE__NO
     INIT_PARAM_STRING( 
 	data_dir, strdup(getRessourcePath()), 
 	"# The location of the Tux Racer data files" );
@@ -850,7 +849,7 @@ int get_config_dir_name( char *buff, int len )
     }
     strcpy( buff, CONFIG_DIR );
     return 0;
-#elif defined(__APPLE__)
+#elif defined(__APPLE__NO)
     const char * configDir = getConfigPath();
     assert(configDir);
 

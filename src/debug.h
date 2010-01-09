@@ -26,7 +26,6 @@ extern "C"
 
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
-#include "TRDebug.h"
 
 typedef enum {
     DEBUG_ODE,

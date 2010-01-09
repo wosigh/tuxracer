@@ -21,7 +21,6 @@
 #include "loop.h"
 #include "ui_mgr.h"
 
-#import "sharedGeneralFunctions.h"
 
 #if defined( HAVE_SDL )
 #   include "SDL.h"

@@ -56,7 +56,6 @@
 #include "os_util.h"
 #include "loading.h"
 #include "tcl_util.h"
-#import "sharedGeneralFunctions.h"
 
 #define WINDOW_TITLE "Tux Racer " VERSION
 
@@ -122,11 +121,8 @@ void read_game_init_script()
 
     
 
-#ifdef __APPLE__
-int libtuxracer_main( int argc, char **argv )
-#else
+#undef main
 int main( int argc, char **argv ) 
-#endif
 {
     /* Print copyright notice */
 
